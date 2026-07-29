@@ -1,23 +1,15 @@
 import streamlit as st
 import plotly.graph_objects as go
+import pandas as pd
 from shared_utils.engines.engineering_compliance_engine import verify_soil_report
-# استدعاء محرك الطاقة والجدوى المالية الجديد
 from shared_utils.engines.energy_sustainability_engine import calculate_energy_roi
+# استدعاء محرك السحابة المركزية وتعمية البيانات الجديد
+from shared_utils.engines.data_anonymizer import anonymize_owner_data, get_provincial_green_stats
 
-# 1. إعدادات الصفحة وهوية المنصة البصرية
+# 1. إعدادات الصفحة وهوية المنصة البصرية القياسية
 st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏗️", layout="wide")
 
-# تهيئة الذاكرة المؤقتة (Session State) لحفظ حالة الخطوات والمؤشرات
-if "step2_completed" not in st.session_state:
-    st.session_state.step2_completed = False
-if "compliance_rate" not in st.session_state:
-    st.session_state.compliance_rate = 42
-if "chart_data" not in st.session_state:
-    st.session_state.chart_data = [30, 35, 40, 41, 42, 42]
-if "soil_results" not in st.session_state:
-    st.session_state.soil_results = None
-
-# تطبيق كود التنسيق الهيكلي (CSS) بطريقة آمنة ومتوافقة مع بايثون 3.14
+# تطبيق كود التنسيق الهيكلي (CSS) المتوافق تماماً مع بايثون 3.14
 theme_css = """
 <style>
     .stApp { background-color: #F8FAFC !important; }
@@ -33,16 +25,21 @@ theme_css = """
     .card-title { font-weight: bold; margin-bottom: 5px; color: #1E293B; }
     .card-value { font-size: 28px; font-weight: bold; margin: 0; color: #0F172A; }
     .roi-box { background-color: #F0FDF4; border: 1px solid #BBF7D0; padding: 15px; border-radius: 8px; margin-top: 15px; }
+    .anonymizer-box { background-color: #F8FAFC; border: 1px dashed #CBD5E1; padding: 15px; border-radius: 8px; font-family: monospace; }
 </style>
 """
 st.html(theme_css)
 
-# 2. القائمة الجانبية للتنقل بين المحاور (Sidebar Navigation)
+# 2. القائمة الجانبية المحدثة لإضافة الخيار الثالث (Sidebar Navigation)
 with st.sidebar:
     st.markdown("### 🗺️ بوابات المنصة")
     app_mode = st.radio(
         "اختر الواجهة المطلوبة:",
-        ["📊 لوحة القيادة والمؤشرات تماثل صورتك", "⚡ حاسبة عزل الطاقة والجدوى للمولدات"]
+        [
+            "📊 لوحة القيادة والمؤشرات تماثل صورتك", 
+            "⚡ حاسبة عزل الطاقة والجدوى للمولدات",
+            "☁️ السحابة المركزية وتعمية بيانات الخصوصية"
+        ]
     )
     st.markdown("---")
     st.caption("المنصة العراقية الموحدة للبناء الأخضر لعام 2026")
@@ -63,7 +60,7 @@ with st.container():
         st.html("<span class='gray-text'>Project Manager</span>")
 
 st.markdown("---")
-# --- تابع لملف main_portal.py (الجزء الثاني والأخير لبوابة الطاقة والامتثال) ---
+# --- تابع لملف main_portal.py (الجزء الأول من الجزء الثاني لبوابات الامتثال والطاقة) ---
 
 if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صورتك":
     # عرض لوحة التحكم الرئيسية المتقدمة والمطابقة لصورتك
@@ -89,7 +86,7 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
                     if result["status"]:
                         st.session_state.step2_completed = True
                         st.session_state.compliance_rate = 55
-                        st.session_state.chart_data = [42, 45, 48, 50, 52, 55]
+                        st.session_state.chart_data = [42, 45, 48, 50, 42, 55]
                         st.rerun()
             else:
                 st.html("<div class='step-done'><span style='color:#10B981; font-weight:bold;'>🟢 Step 2: Soil Inspection & Foundations</span> <span class='completed-badge'>Completed</span></div>")
@@ -99,7 +96,7 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
                 if st.button("🔄 Clear and Re-upload File"):
                     st.session_state.step2_completed = False
                     st.session_state.compliance_rate = 42
-                    st.session_state.chart_data = [42, 45, 48, 50, 52, 42]
+                    st.session_state.chart_data = [42, 45, 48, 50, 42, 42]
                     st.session_state.soil_results = None
                     st.rerun()
 
@@ -130,7 +127,7 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
             with st.container(border=True):
                 st.html("<div class='card-title'>🟢 2. Structural Integrity</div>")
                 st.html("<div class='card-value'>0%</div>")
-                fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[10, 20, 30, 42], marker_color='#10B981'))
+                fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[0, 0, 0, 0], marker_color='#10B981'))
                 fig_bar.update_layout(margin=dict(l=5,r=5,t=5,b=5), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart", config={'displayModeBar': False})
 
@@ -156,13 +153,11 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
                 st.html("<div class='card-value'>14%</div>")
                 st.progress(0.14)
 
-else:
-    # عرض بوابة الاستدامة وحساب تعرفة المولدات وعائد عزل الطاقة صيفاً
+elif app_mode == "⚡ حاسبة عزل الطاقه والجدوى للمولدات":
     st.markdown("### ⚡ بوابة إدارة الطاقة المستدامة وحساب فواتير المولدات الأهلية صيفاً")
     st.info("هذه الحاسبة متوافقة مع الكود الإنشائي العراقي وتعتمد على درجات الحرارة القصوى لمدينة بغداد.")
     
     col_input, col_output = st.columns(2)
-    
     with col_input:
         with st.container(border=True):
             st.markdown("#### 📥 مدخلات المبنى والموقع")
@@ -173,14 +168,11 @@ else:
 
     with col_output:
         if calculate_btn:
-            # استدعاء ومعالجة البيانات عبر المحرك الذي أنشأته في الدفعة 4
             results = calculate_energy_roi(area, insulation, amps)
-            
             with st.container(border=True):
                 st.markdown("#### 📊 التقرير الهندسي والمالي للاستدامة")
                 st.write(f"☀️ درجة الحرارة التصميمية صيفاً لوسط العراق: **{results['design_temp']}°C**")
                 st.write(f"📉 معامل الكسب الحراري الكلي للجدران `U-Value`: **{results['u_value']} W/m²K**")
-                
                 st.html(f"""
                 <div class="roi-box">
                     <h5 style="color:#065F46; margin:0;">📉 الوفر في استهلاك الكهرباء والأمبيرات:</h5>
@@ -193,12 +185,67 @@ else:
                 """)
         else:
             st.markdown("#### ⏳ بانتظار المدخلات")
-            st.caption("الرجاء تحديد مواصفات المبنى والضغط على زر التشغيل لإصدار التقرير المستدام.")
+# --- تابع لملف main_portal.py (الجزء الثاني والأخير لعرض بوابة السحابة والفوتر) ---
+
+else:
+    # عرض بوابة السحابة المركزية وتعمية الخصوصية (المحور الثالث)
+    st.markdown("### ☁️ بوابة السحابة المركزية ومجمّع المؤشرات الوطنية")
+    st.info("تستعرض هذه الواجهة البيانات المجمّعة للمحافظات مع تفعيل خوارزمية تعمية الخصوصية لحماية معلومات المواطنين.")
+    
+    col_mask, col_stats = st.columns(2)
+    
+    with col_mask:
+        with st.container(border=True):
+            st.markdown("#### 🔐 نظام حماية البيانات والخصوصية الفوري")
+            st.caption("ادخل نصاً يحتوي على معلومات حساسة (مثل هاتف عراقي أو رقم بطاقة موحدة) لاختبار خوارزمية الحجب:")
+            raw_input = st.text_area(
+                "بيانات المالك التجريبية:", 
+                value="المالك: أحمد العبيدي، هاتف: 07701234567، الرقم الوطني الموحد: 199012345678، موقع المشروع: بغداد/المنصور"
+            )
+            if st.button("🔒 تشغيل فلتر الحجب والتعمية", type="primary"):
+                masked_output = anonymize_owner_data(raw_input)
+                st.markdown("**📄 النص المشفّر الجاهز للرفع للسحابة المركزية:**")
+                st.html(f"<div class='anonymizer-box'>{masked_output}</div>")
+                st.success("✅ تم حجب الهوية والحفاظ على السرية السيادية للبيانات!")
+
+    with col_stats:
+        with st.container(border=True):
+            st.markdown("#### 📈 البيانات المجمّعة للمحافظات العراقية (البناء الأخضر)")
+            raw_stats = get_provincial_green_stats()
+            df = pd.DataFrame(raw_stats)
+            
+            # عرض جدول البيانات الرسمي للمحافظات
+            st.dataframe(df, use_container_width=True, hide_index=True)
+            
+            # رسم بياني تفاعلي لترتيب المحافظات حسب الوفر الكربوني والتزامها بالعزل
+            fig_prov = go.Figure(go.Bar(
+                x=df["المحافظة"], 
+                y=df["الوفر الكربوني التراكمي (طن)"], 
+                marker_color='#2563EB',
+                text=df["نسبة الالتزام بالعزل (%)"].apply(lambda x: f"التزام {x}%"),
+                textposition='auto'
+            ))
+            fig_prov.update_layout(
+                title="ترتيب المحافظات الأعلى وفراً للكربون والطاقة لعام 2026",
+                margin=dict(l=20, r=20, t=40, b=20), 
+                height=220,
+                plot_bgcolor='rgba(0,0,0,0)'
+            )
+            st.plotly_chart(fig_prov, use_container_width=True, config={'displayModeBar': False})
 
 st.markdown("---")
-# شريط التوثيقات الموحد
+
+# 4. شريط التوثيقات الموحد للفوتر لإغلاق الصفحة بشكل أنيق
 f1, f2, f3, f4 = st.columns(4)
-f1.markdown("🛡️ **Secure & Sovereign**")
-f2.markdown("🧠 **AI-Powered Analytics**")
-f3.markdown("✅ **Regulatory Compliance**")
-f4.markdown("🎧 **Expert Support**")
+with f1:
+    st.markdown("🛡️ **Secure & Sovereign**")
+    st.caption("End-to-end data protection with local compliance")
+with f2:
+    st.markdown("🧠 **AI-Powered Analytics**")
+    st.caption("Smarter insights for better construction decisions")
+with f3:
+    st.markdown("✅ **Regulatory Compliance**")
+    st.caption("Aligned with national & international green building standards")
+with f4:
+    st.markdown("🎧 **Expert Support**")
+    st.caption("Dedicated engineering support team")
