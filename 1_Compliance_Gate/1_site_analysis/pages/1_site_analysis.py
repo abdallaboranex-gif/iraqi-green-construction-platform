@@ -39,9 +39,9 @@ with col_inputs:
     plot_type = st.radio("نوع واجهة القطعة:", ["واجهة واحدة (وسطية)", "ركن (على شارعين)"])
     
     col_dims = st.columns(2)
-    with col_dims[0]:
+    with col_dims:
         frontage = st.number_input("عرض واجهة الأرض (متر):", value=10.0, step=0.5)
-    with col_dims[1]:
+    with col_dims:
         depth = st.number_input("نزال / طول الأرض (متر):", value=20.0, step=0.5)
         
     floors = st.slider("عدد الطوابق المخطط بناؤها مستقبلاً:", min_value=1, max_value=5, value=2)
