@@ -1,9 +1,9 @@
 import streamlit as st
 
-# 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
+# 1. إعدادات المظهر البصري وهوية شركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. حقن ثيم الـ CSS (إصلاح مسار الروابط الخام بالامتداد الحقيقي .jpeg الظاهر في الصورة)
+# 2. حقن ثيم الـ CSS المتطابق مع هيكلية المجلدات المحلية والامتداد الحقيقي .jpeg
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -12,16 +12,16 @@ st.markdown("""
         font-family: 'Tajawal', sans-serif !important;
     }
     
-    /* حل مشكلة الخلفية: استخدام الرابط الخام الصحيح والمباشر مع الامتداد الحقيقي .jpeg */
+    /* قراءة الخلفية محلياً ومباشرة من مجلد assets بالامتداد الصحيح .jpeg الظاهر في غيت هاب */
     .stApp {
         background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
-                    url('https://githubusercontent.com');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
+                    url('app/static/assets/cloud_grid_bg.jpeg') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
     
-    /* تنسيق حاوية اللوغو ليكون أنيقاً وفي الزاوية بحجم متناسق */
+    /* تنسيق حاوية اللوغو لتكون أنيقة وحجمها 180 بكسل فقط في الزاوية */
     [data-testid="stImage"] img {
         width: 180px !important;
         height: auto !important;
@@ -31,31 +31,31 @@ st.markdown("""
     
     /* تنسيق الحاويات العائمة للأزرار والبرامج */
     .axis-container {
-        background-color: rgba(255, 255, 255, 0.95);
-        padding: 1.75rem;
-        border-radius: 14px;
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.5rem;
-        backdrop-filter: blur(8px);
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        padding: 1.75rem !important;
+        border-radius: 14px !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: 1.5rem !important;
+        backdrop-filter: blur(8px) !important;
     }
     
     .axis-title-1 {
-        color: #0A2540;
-        border-right: 5px solid #00CC96;
-        padding-right: 10px;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 1.25rem;
+        color: #0A2540 !important;
+        border-right: 5px solid #00CC96 !important;
+        padding-right: 10px !important;
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1.25rem !important;
     }
     
     .axis-title-2 {
-        color: #0A2540;
-        border-right: 5px solid #FF9F43;
-        padding-right: 10px;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 1.25rem;
+        color: #0A2540 !important;
+        border-right: 5px solid #FF9F43 !important;
+        padding-right: 10px !important;
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1.25rem !important;
     }
 
     /* أزرار الخدمات والبرامج الممتدة الفاخرة */
@@ -86,7 +86,7 @@ st.markdown("""
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بالامتداد الفعلي .jpeg من مجلد الأصول
+# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بالامتداد الفعلي .jpeg من مجلد الأصول المحلي
 col_logo_img, col_empty, col_lang = st.columns(3)
 with col_logo_img:
     st.image("assets/corporate_logo.jpeg")
@@ -119,7 +119,7 @@ t = {
 }
 lang = st.session_state.lang
 
-# 4. عرض نصوص العناوين الرئيسية
+# 4. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
 st.markdown(f'<h1 style="color: white; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
 st.markdown(f'<p style="color: #E2E8F0; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
 
@@ -147,7 +147,7 @@ prog7 = st.button(t["prog7"][lang], use_container_width=True)
 prog8 = st.button(t["prog8"][lang], use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 6. إطلاق رسالة القفل المالي
+# 6. إطلاق رسالة القفل المالي عند الضغط على الأزرار المحمية
 if prog1:
     st.toast("🚀 Open Program 1 UI..." if lang == "en" else "🚀 جاري فتح واجهة البرنامج 1...")
 if prog2 or prog3 or prog4 or prog5 or prog6 or prog7 or prog8:
