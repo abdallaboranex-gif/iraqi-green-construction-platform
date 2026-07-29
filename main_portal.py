@@ -1,18 +1,148 @@
 import streamlit as st
 
-# البوابة الرئيسية التي تعيد توجيه المستخدم بالروابط الذكية للبرامج المعزولة
-st.set_page_config(page_title="منصة البناء المستدام العراقي", page_icon="🏢", layout="wide")
+# 1. إعدادات المظهر البصري وهوية الشركة الاستشارية
+st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-st.title("🏢 منصة البيانات الوطنية للبناء المستدام العراقي")
-st.caption("بوابة أتمتة كودات البناء وإدارة الطاقة واستشارات السوق العقاري")
+# 2. حقن ثيم الـ CSS لدمج الخلفية واللوغو والخطوط من داخل الملف مباشرة
+st.markdown("""
+    <style>
+    @import url('https://googleapis.com');
+    
+    * {
+        font-family: 'Tajawal', sans-serif !important;
+    }
+    
+    /* ربط الخلفية الملكية المرفوعة بداخل مجلد assets لتغطي كامل الشاشة */
+    .stApp {
+        background: linear-gradient(rgba(10, 37, 64, 0.45), rgba(10, 37, 64, 0.45)), 
+                    url('app/static/assets/cloud_grid_bg.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
+    /* تنسيق الحاويات العائمة للأزرار لتبدو فاخرة وعصرية */
+    .axis-container {
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 1.75rem;
+        border-radius: 14px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(8px);
+    }
+    
+    .axis-title-1 {
+        color: #0A2540;
+        border-right: 5px solid #00CC96;
+        padding-right: 10px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+    }
+    
+    .axis-title-2 {
+        color: #0A2540;
+        border-right: 5px solid #FF9F43;
+        padding-right: 10px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+    }
+
+    /* أزرار الخدمات والبرامج الفاخرة */
+    div.stButton > button {
+        background-color: #FFFFFF !important;
+        color: #334155 !important;
+        border: 1px solid #E2E8F0 !important;
+        padding: 0.8rem 1.2rem !important;
+        border-radius: 10px !important;
+        text-align: right !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+        transition: all 0.25s ease-in-out !important;
+    }
+    
+    div.stButton > button:hover {
+        border-color: #00CC96 !important;
+        color: #00CC96 !important;
+        background-color: #F0FDF4 !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 10px 20px rgba(0, 204, 150, 0.15) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# 3. إدارة وتبديل اللغات بداخل جلسة العميل الموحدة
+if "lang" not in st.session_state:
+    st.session_state.lang = "ar"
+
+# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة
+col_logo_img, col_empty, col_lang = st.columns([2, 5, 2])
+with col_logo_img:
+    # استدعاء وعرض اللوغو الحقيقي لشركة الاستدامة الخضراء من مجلد الأصول
+    st.image("assets/corporate_logo.jpeg", use_container_width=True)
+
+with col_lang:
+    if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
+        st.session_state.lang = "en" if st.session_state.lang == "ar" else "ar"
+        st.rerun()
+
+# قاموس المصطلحات المترجم بالكامل للوحة الأم
+t = {
+    "title": {"ar": "منصة البيانات الوطنية للبناء المستدام 🏢", "en": "National Green Construction Data Platform 🏢"},
+    "subtitle": {"ar": "بوابة شركة الاستدامة الخضراء لأتمتة الكودات الهندسية واستشارات السوق العقاري", "en": "Automated Compliance, Energy Optimization & Market Intelligence Portal"},
+    "project_loc": {"ar": "📍 موقع المشروع الحالي: بغداد", "en": "📍 Current Project Location: Baghdad"},
+    "user_profile": {"ar": "👤 حساب المهندس: عبدالله علي", "en": "👤 Engineer Profile: Abdulla Ali"},
+    "upgrade_btn": {"ar": "👑 تفعيل الباقة الفاخرة واشتراك المنصة", "en": "👑 Upgrade to Premium Suite"},
+    "axis1": {"ar": "🏛️ المحور الأول: بوابة مطابقة الكودات الهندسية والأمان", "en": "🏛️ Axis 1: Engineering Compliance & Safety Gate"},
+    "axis2": {"ar": "⚡ المحور الثاني: بوابة إدارة الطاقة والاستدامة المالية", "en": "⚡ Axis 2: Energy Optimization & Financial ROI"},
+    "locked_msg": {"ar": "🔒 عذراً، هذه الخدمة تتطلب اشتراكاً مدفوعاً وتدفق عمل متسلسل إجباري. يرجى البدء بالبرنامج 1 أولاً.", "en": "🔒 Locked. This service requires a premium subscription and strict sequential workflow. Please start with Program 1."},
+    
+    "prog1": {"ar": "🏢 البرنامج 1: تحليل الموقع والمحددات البلدية (مفتوح للتجربة) ➔", "en": "🏢 Program 1: Site Analysis & Zoning Regulations (Open for Demo) ➔"},
+    "prog2": {"ar": "🧪 البرنامج 2: فحص التربة وتصميم الأسس 🔒", "en": "🧪 Program 2: Geotechnical Inspection & Foundation Design 🔒"},
+    "prog3": {"ar": "🧱 البرنامج 3: التدقيق الإنشائي وحساب الأحمال والسلامة 🔒", "en": "🧱 Program 3: Structural Audit & Load Calculations 🔒"},
+    "prog4": {"ar": "🚰 البرنامج 4: هندسة التأسيسات الصحية والمائية 🔒", "en": "🚰 Program 4: Hydro-Sanitary & Plumbing Design 🔒"},
+    "prog5": {"ar": "⚡ البرنامج 5: هندسة التأسيسات الكهربائية 🔒", "en": "⚡ Program 5: Electrical Systems Analysis 🔒"},
+    
+    "prog6": {"ar": "❄️ البرنامج 6: حسابات العزل الحراري وغلاف المبنى 🔒", "en": "❄️ Program 6: Thermal Insulation & Building Envelope 🔒"},
+    "prog7": {"ar": "💨 البرنامج 7: تخمين أحمال التكييف وتصميم المنظومات 🔒", "en": "💨 Program 7: HVAC Load Estimation & System Design 🔒"},
+    "prog8": {"ar": "💰 البرنامج 8: حاسبة كلف التشغيل وفترة استرداد رأس المال 🔒", "en": "💰 Program 8: Operational Cost & ROI Calculator 🔒"},
+}
+lang = st.session_state.lang
+
+# 4. تصفيف نصوص العناوين الرئيسية فوق الخلفية الفاخرة
+st.title(t["title"][lang])
+st.write(f"**{t['subtitle'][lang]}**")
+
+col_meta1, col_meta2, col_meta3 = st.columns(3)
+with col_meta1: st.info(t["project_loc"][lang])
+with col_meta2: st.success(t["user_profile"][lang])
+with col_meta3: st.button(t["upgrade_btn"][lang], type="primary", use_container_width=True)
 
 st.divider()
 
-st.markdown("### 🏛️ المحور الأول: بوابة مطابقة الكودات الهندسية والأمان")
+# 5. عرض كتل المحاور الستة كحاويات عائمة أنيقة فوق الخلفية الملكية
+# المحور الأول
+st.markdown(f'<div class="axis-container"><div class="axis-title-1">{t["axis1"][lang]}</div>', unsafe_allow_html=True)
+prog1 = st.button(t["prog1"][lang], use_container_width=True)
+prog2 = st.button(t["prog2"][lang], use_container_width=True)
+prog3 = st.button(t["prog3"][lang], use_container_width=True)
+prog4 = st.button(t["prog4"][lang], use_container_width=True)
+prog5 = st.button(t["prog5"][lang], use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# تم تحديث التوجيه هنا ليتصل بالملف الفرعي الآمن والمسجل تلقائياً بداخل مجلد pages
-if st.button("🏢 اضغط للدخول إلى البرنامج 1: تحليل الموقع والمحددات البلدية ➔", use_container_width=True):
-    st.switch_page("pages/1_site_analysis.py") # أمر التوجيه السحابي النظيف والآمن 🆕
+# المحور الثاني
+st.markdown(f'<div class="axis-container"><div class="axis-title-2">{t["axis2"][lang]}</div>', unsafe_allow_html=True)
+prog6 = st.button(t["prog6"][lang], use_container_width=True)
+prog7 = st.button(t["prog7"][lang], use_container_width=True)
+prog8 = st.button(t["prog8"][lang], use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-if st.button("🧪 البرنامج 2: فحص التربة وتصميم الأسس 🔒", use_container_width=True):
-    st.error("🔒 عذراً، هذا البرنامج مقفل. يجب إكمال فحص الموقع في البرنامج 1 وتفعيل الاشتراك أولاً.")
+# 6. إطلاق رسالة القفل المالي والاشتراكات عند الضغط على الأزرار المحمية
+if prog1:
+    st.toast("🚀 Open Program 1 UI..." if lang == "en" else "🚀 جاري فتح واجهة البرنامج 1...")
+    # هنا سيتم لاحقاً وضع التوجيه الرسمي لصفحة الفحص المعزولة
+if prog2 or prog3 or prog4 or prog5 or prog6 or prog7 or prog8:
+    st.error(t["locked_msg"][lang])
