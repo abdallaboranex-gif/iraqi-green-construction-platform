@@ -4,18 +4,18 @@ import plotly.graph_objects as go
 # 1. إعدادات الصفحة وهوية المنصة البصرية
 st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏗️", layout="wide")
 
-# تطبيق كود CSS مخصص لمحاكاة التصميم الحديث (البطاقات البيضاء، الحواف الدائرية، والظلال)
-st.markdown("""
-    <style>
-    .main { background-color: #F8FAFC; }
-    .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+# تصميم الأسلوب المرئي وحل مشكلة التعارض البرمجي بطريقة معزولة
+theme_css = """
+<style>
+    .stApp { background-color: #F8FAFC !important; }
     .header-box { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
     .card { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; height: 100%; }
     .step-box { border: 1px solid #E2E8F0; padding: 15px; border-radius: 10px; margin-bottom: 12px; background-color: #F8FAFC; }
     .step-active { border: 1px solid #FFEDD5; background-color: #FFFFf0; border-left: 5px solid #F97316; }
     .premium-box { background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
-    </style>
-""", unsafe_allowed_html=True)
+</style>
+"""
+st.html(theme_css)
 
 # 2. الهيدر العلوي (Header)
 with st.container():
@@ -54,7 +54,7 @@ with col_left:
     uploaded_file = st.file_uploader("Upload (Soil Lab PDF) - Max 50MB", type=["pdf"], label_visibility="visible")
     st.markdown('</div>', unsafe_allowed_html=True)
     
-    # الخطوات 3 و 4 و 5: مقفلة (Locked) تم التعديل هنا لحل مشكلة السلسلة النصية والأقواس الحاصرة
+    # الخطوات 3 و 4 و 5: مقفلة (Locked)
     steps_data = [
         ("3", "Structural Audit & Load Calculations"),
         ("4", "Hydro-Sanitary & Plumbing Design"),
@@ -89,7 +89,7 @@ with col_right:
         st.markdown("<h6>🔵 1. Engineering Compliance</h6>", unsafe_allowed_html=True)
         st.markdown("<h3 style='margin-bottom:0;'>42%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
         # رسم بياني خطي صغير للتطور التراكمي
-        fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=[20, 30, 45, 40, 55, 70], mode='lines+markers', line=dict(color='#2563EB', width=2)))
+        fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=[30, 35, 40, 52, 60, 85], mode='lines+markers', line=dict(color='#2563EB', width=2)))
         fig_line.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_line, use_container_width=True, key="compliance_chart")
         st.markdown('</div>', unsafe_allowed_html=True)
@@ -99,7 +99,7 @@ with col_right:
         st.markdown("<h6>🟢 2. Structural Integrity</h6>", unsafe_allowed_html=True)
         st.markdown("<h3 style='margin-bottom:0;'>0%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
         # رسم بياني أعمدة لحالة الهيكل الإنشائي
-        fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[10, 40, 35, 60], marker_color='#10B981'))
+        fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[10, 30, 45, 70], marker_color='#10B981'))
         fig_bar.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart")
         st.markdown('</div>', unsafe_allowed_html=True)
