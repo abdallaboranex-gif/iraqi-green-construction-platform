@@ -7,7 +7,8 @@ st.set_page_config(page_title="منصة البناء المستدام العرا
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-col_logo, col_lang = st.columns()
+# تم إصلاح الخطأ هنا بتحديد رقم 2 للأعمدة
+col_logo, col_lang = st.columns(2)
 with col_lang:
     if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
         st.session_state.lang = "en" if st.session_state.lang == "ar" else "ar"
