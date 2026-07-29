@@ -7,7 +7,7 @@ from shared_utils.engines.data_anonymizer import anonymize_owner_data, get_provi
 
 st.set_page_config(page_title="Iraqi Green Construction", page_icon="🏗️", layout="wide")
 
-# تهيئة الذاكرة بشكل صريح وآمن بدون أي مصفوفات معقدة قابلة للتلف
+# تهيئة الذاكرة بطريقة رياضية آمنة تمنع الحذف والـ SyntaxError
 if "step2_completed" not in st.session_state:
     st.session_state["step2_completed"] = False
 if "compliance_rate" not in st.session_state:
@@ -79,7 +79,6 @@ if app_mode == "Dashboard":
                     if result.get("status", False):
                         st.session_state["step2_completed"] = True
                         st.session_state["compliance_rate"] = 55
-                        # تحديث قيم الرسم البياني رقمياً بشكل صريح لمنع الـ SyntaxError
                         st.session_state["val6"] = 55
                         st.rerun()
             else:
@@ -112,7 +111,6 @@ if app_mode == "Dashboard":
                 current_rate = st.session_state.get("compliance_rate", 42)
                 st.html(f"<div class='card-value'>{current_rate}%</div>")
                 
-                # تجميع مصفوفة الرسم البياني من قيم الذاكرة الصريحة والمؤمنة
                 chart_list = [
                     st.session_state.get("val1", 10),
                     st.session_state.get("val2", 20),
@@ -128,7 +126,8 @@ if app_mode == "Dashboard":
             with st.container(border=True):
                 st.html("<div class='card-title'>🟢 2. Structural Integrity</div>")
                 st.html("<div class='card-value'>0%</div>")
-                structural_list = [0, 0, 0, 0]
+                # تم معالجة مصفوفة الهيكل الإنشائي برمجياً لتجنب الحذف تماماً
+                structural_list = list(map(int, "0000"))
                 fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=structural_list, marker_color='#10B981'))
                 fig_bar.update_layout(margin=dict(l=5,r=5,t=5,b=5), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart", config={'displayModeBar': False})
@@ -190,7 +189,6 @@ else:
             df = pd.DataFrame(raw_stats)
             st.dataframe(df, use_container_width=True, hide_index=True)
             
-            # بناء قائمة رسم بياني للمحافظات بطرق صريحة وآمنة هندسياً
             carbon_list = df["الوفر الكربوني التراكمي (طن)"].tolist()
             fig_prov = go.Figure(go.Bar(
                 x=df["المحافظة"], 
