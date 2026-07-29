@@ -1,9 +1,9 @@
 import streamlit as st
 
-# 1. إعدادات المظهر البصري للمنصة (الشركة الاستشارية)
+# 1. إعدادات المظهر البصري للمنصة
 st.set_page_config(page_title="منصة البناء المستدام العراقي", page_icon="🏢", layout="wide")
 
-# 2. إدارة وتبديل اللغات بداخل جلسة العميل الموحدة
+# 2. إدارة وتبديل اللغات بداخل جلسة العميل
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
@@ -21,12 +21,11 @@ t = {
     "upgrade_btn": {"ar": "👑 تفعيل الباقة الفاخرة واشتراك المنصة", "en": "👑 Upgrade to Premium Suite"},
     "axis1": {"ar": "🏛️ المحور الأول: بوابة مطابقة الكودات الهندسية والأمان", "en": "🏛️ Axis 1: Engineering Compliance & Safety Gate"},
     "axis2": {"ar": "⚡ المحور الثاني: بوابة إدارة الطاقة والاستدامة المالية", "en": "⚡ Axis 2: Energy Optimization & Financial ROI"},
-    "axis4": {"ar": "📊 المحور الرابع: لوحة التحليلات الاستراتيجية والمؤشرات العمرانية", "en": "📊 Axis 4: Enterprise Market Insights"},
     "locked_msg": {"ar": "🔒 عذراً، هذه الخدمة تتطلب اشتراكاً مدفوعاً وتدفق عمل متسلسل إجباري. يرجى البدء بالبرنامج 1 أولاً.", "en": "🔒 Locked. This service requires a premium subscription and strict sequential workflow. Please start with Program 1."},
 }
 lang = st.session_state.lang
 
-# 3. هيدر اللوحة الأم والبيانات الجغرافية والتعريفية للمشروع
+# 3. هيدر اللوحة الأم والبيانات الجغرافية
 st.title(t["title"][lang])
 st.caption(t["subtitle"][lang])
 
@@ -61,7 +60,6 @@ if prog1:
         area = st.number_input("أدخل مساحة الأرض الكلية (متر مربع):", value=200, step=50)
         street = st.number_input("أدخل عرض الشارع الأمامي (متر):", value=10, step=2)
     
-    # حسابات الكود خلف الكواليس
     allowed_area = area * 0.75
     setback = 3 if street > 8 else 2
     
