@@ -50,5 +50,57 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# سطر تجريبي مؤقت للتأكد من عمل الجزء الأول بنجاح
-st.write("تم تحميل الثيم البصري بنجاح...")
+# =====================================================================
+# 3. محرك الرسوم البيانية التفاعلية (Plotly Gauge & Trend Engine)
+# =====================================================================
+
+def draw_gauge_chart(percent, title, color):
+    """رسم الدوائر البيانية الملونة لنسب الإنجاز والمطابقة"""
+    fig = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = percent,
+        number = {'suffix': "%", 'font': {'size': 20, 'family': 'Tajawal'}},
+        title = {'text': title, 'font': {'size': 14, 'family': 'Tajawal', 'color': '#334155'}},
+        gauge = {
+            'axis': {'range':, 'tickwidth': 1, 'tickcolor': "#CBD5E1"},
+            'bar': {'color': color},
+            'bgcolor': "#E2E8F0",
+            'borderwidth': 0,
+        }
+    ))
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=40, b=10),
+        height=140,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    return fig
+
+def draw_trend_chart():
+    """رسم المخطط الانسيابي الأزرق لمؤشر الالتزام (Compliance Trend)"""
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+    values = [45, 52, 48, 60, 72, 85]
+    
+    df = pd.DataFrame({'Month': months, 'Progress': values})
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df['Month'], y=df['Progress'],
+        mode='lines+markers',
+        line=dict(color='#2563EB', width=3),
+        marker=dict(size=6, color='#1D4ED8'),
+        fill='tozeroy',
+        fillcolor='rgba(37, 99, 235, 0.08)'
+    ))
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=120,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(showgrid=False, zeroline=False),
+        yaxis=dict(showgrid=True, gridcolor='#E2E8F0', zeroline=False)
+    )
+    return fig
+
+# سطر تجريبي مؤقت للتأكد من ربط محرك الرسوم البيانية بنجاح
+st.write("تم تحميل محرك الرسوم البيانية والجارتات بنجاح...")
