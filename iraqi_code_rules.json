@@ -1,0 +1,19 @@
+{
+  "municipal_regulations": {
+    "min_front_setback_meters": 3.0,
+    "min_side_setback_meters": 1.5,
+    "max_building_height_meters": 12.0
+  },
+  "geotechnical_standards": {
+    "min_bearing_capacity_kpa": 50.0,
+    "standard_safety_factor": 3.0
+  },
+  "thermal_insulation": {
+    "max_wall_u_value": 0.8,
+    "design_summer_temp_celsius": 50.0,
+    "generator_amp_tariff_iqd": 15000
+  },
+  "electrical_standards": {
+    "max_phase_unbalance_percent": 10.0
+  }
+}
