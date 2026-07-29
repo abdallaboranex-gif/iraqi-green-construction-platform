@@ -1,9 +1,23 @@
 import streamlit as st
 
-# 1. إعدادات المظهر البصري وهوية شركة الاستدامة الخضراء
+# 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. حقن ثيم الـ CSS المتطابق مع هيكلية المجلدات المحلية والامتداد الحقيقي .jpeg
+# 2. كسر حظر السيرفر وحقن الخلفية كطبقة بصرية كاملة ممتدة تحت الأزرار
+st.markdown("""
+    <div style="
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: -1;
+        background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
+                    url('https://githubusercontent.com');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    "></div>
+    """, unsafe_allow_html=True)
+
+# 3. حقن تنسيقات الكتل والخطوط لتعوم فوق طبقة الخلفية بنقاء
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -12,16 +26,7 @@ st.markdown("""
         font-family: 'Tajawal', sans-serif !important;
     }
     
-    /* قراءة الخلفية محلياً ومباشرة من مجلد assets بالامتداد الصحيح .jpeg الظاهر في غيت هاب */
-    .stApp {
-        background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
-                    url('app/static/assets/cloud_grid_bg.jpeg') !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-attachment: fixed !important;
-    }
-    
-    /* تنسيق حاوية اللوغو لتكون أنيقة وحجمها 180 بكسل فقط في الزاوية */
+    /* تصغير اللوغو ليكون أنيقاً ومتناسقاً بحجم 180 بكسل في الزاوية */
     [data-testid="stImage"] img {
         width: 180px !important;
         height: auto !important;
@@ -29,7 +34,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* تنسيق الحاويات العائمة للأزرار والبرامج */
+    /* تنسيق الكتل العائمة للأزرار */
     .axis-container {
         background-color: rgba(255, 255, 255, 0.95) !important;
         padding: 1.75rem !important;
@@ -58,7 +63,7 @@ st.markdown("""
         margin-bottom: 1.25rem !important;
     }
 
-    /* أزرار الخدمات والبرامج الممتدة الفاخرة */
+    /* أزرار الخدمات الفاخرة */
     div.stButton > button {
         background-color: #FFFFFF !important;
         color: #334155 !important;
@@ -82,11 +87,10 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. إدارة وتبديل اللغات بداخل جلسة العميل الموحدة
+# 4. إدارة وتبديل اللغات بداخل جلسة العميل الموحدة
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بالامتداد الفعلي .jpeg من مجلد الأصول المحلي
 col_logo_img, col_empty, col_lang = st.columns(3)
 with col_logo_img:
     st.image("assets/corporate_logo.jpeg")
@@ -119,7 +123,7 @@ t = {
 }
 lang = st.session_state.lang
 
-# 4. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
+# 5. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
 st.markdown(f'<h1 style="color: white; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
 st.markdown(f'<p style="color: #E2E8F0; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
 
@@ -130,7 +134,7 @@ with col_meta3: st.button(t["upgrade_btn"][lang], type="primary", use_container_
 
 st.divider()
 
-# 5. عرض كتل المحاور كحاويات عائمة أنيقة فوق الخلفية الملكية
+# 6. عرض كتل المحاور كحاويات عائمة أنيقة فوق الخلفية الملكية
 # المحور الأول
 st.markdown(f'<div class="axis-container"><div class="axis-title-1">{t["axis1"][lang]}</div>', unsafe_allow_html=True)
 prog1 = st.button(t["prog1"][lang], use_container_width=True)
@@ -147,7 +151,7 @@ prog7 = st.button(t["prog7"][lang], use_container_width=True)
 prog8 = st.button(t["prog8"][lang], use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 6. إطلاق رسالة القفل المالي عند الضغط على الأزرار المحمية
+# 7. إطلاق رسالة القفل المالي عند الضغط على الأزرار المحمية
 if prog1:
     st.toast("🚀 Open Program 1 UI..." if lang == "en" else "🚀 جاري فتح واجهة البرنامج 1...")
 if prog2 or prog3 or prog4 or prog5 or prog6 or prog7 or prog8:
