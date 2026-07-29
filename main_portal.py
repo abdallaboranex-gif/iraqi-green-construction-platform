@@ -2,226 +2,147 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-# 1. إعدادات الصفحة الكلية لتكون عريضة ومطابقة لأبعاد لوحات التحكم العالمية
-st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏢", layout="wide")
+# 1. إعدادات الصفحة وهوية المنصة البصرية
+st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏗️", layout="wide")
 
-# 2. حقن ثيم الـ CSS المتطور لصناعة البطاقات العائمة والظلال الناعمة والخطوط العصريّة
+# تطبيق كود CSS مخصص لمحاكاة التصميم الحديث (البطاقات البيضاء، الحواف الدائرية، والظلال)
 st.markdown("""
     <style>
-    @import url('https://googleapis.com');
-    
-    /* ضبط الخط والألوان الخلفية الكلية للمنصة */
-    * {
-        font-family: 'Tajawal', sans-serif !important;
-    }
-    .stApp {
-        background-color: #F1F5F9 !important; /* الرمادي الفاتح الفخم المتواجد بالصورة */
-    }
-    
-    /* تصميم البطاقات البيضاء العائمة ذات الحواف المستديرة والظلال الناعمة */
-    .dashboard-card {
-        background-color: #FFFFFF !important;
-        padding: 1.5rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        margin-bottom: 1rem;
-    }
-    
-    /* تسميات مؤشرات الحالة (Status Badges) */
-    .badge-completed {
-        background-color: #DCFCE7; color: #15803D;
-        padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
-    }
-    .badge-progress {
-        background-color: #FFEDD5; color: #C2410C;
-        padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
-    }
-    
-    /* حاوية الإعلان الفاخر للاشتراك المدفوع باللون النيلي والتاج الذهبي */
-    .premium-banner {
-        background: linear-gradient(135deg, #0A2540 0%, #1E3A8A 100%);
-        padding: 1.75rem;
-        border-radius: 16px;
-        color: white;
-        box-shadow: 0 10px 25px rgba(10, 37, 64, 0.15);
-        margin-top: 1.5rem;
-    }
+    .main { background-color: #F8FAFC; }
+    .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+    .header-box { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
+    .card { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; height: 100%; }
+    .step-box { border: 1px solid #E2E8F0; padding: 15px; border-radius: 10px; margin-bottom: 12px; background-color: #F8FAFC; }
+    .step-active { border: 1px solid #FFEDD5; background-color: #FFFFf0; border-left: 5px solid #F97316; }
+    .premium-box { background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
     </style>
-    """, unsafe_allow_html=True)
+""", unsafe_allowed_html=True)
 
-# =====================================================================
-# 3. محرك الرسوم البيانية التفاعلية (Plotly Gauge & Trend Engine)
-# =====================================================================
+# 2. الهيدر العلوي (Header)
+with st.container():
+    col_logo, col_lang, col_loc, col_user = st.columns([3, 1, 2, 2])
+    with col_logo:
+        st.markdown("### 🏢 Iraqi Green Construction")
+        st.caption("Data • Compliance • Sustainability • Efficiency")
+    with col_lang:
+        st.segmented_control("Language", ["العربية", "EN"], default="EN", label_visibility="collapsed")
+    with col_loc:
+        st.markdown("**📍 Current Project Location:**<br><span style='color:#059669; font-weight:bold;'>Baghdad</span>", unsafe_allowed_html=True)
+    with col_user:
+        st.markdown("**👨‍💼 Eng. Abdulla**<br><span style='color:#64748B;'>Project Manager</span>", unsafe_allowed_html=True)
 
-def draw_gauge_chart(percent, title, color):
-    """رسم الدوائر البيانية الملونة لنسب الإنجاز والمطابقة"""
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = percent,
-        number = {'suffix': "%", 'font': {'size': 20, 'family': 'Tajawal'}},
-        title = {'text': title, 'font': {'size': 14, 'family': 'Tajawal', 'color': '#334155'}},
-        gauge = {
-            'axis': {'range':, 'tickwidth': 1, 'tickcolor': "#CBD5E1"},
-            'bar': {'color': color},
-            'bgcolor': "#E2E8F0",
-            'borderwidth': 0,
-        }
-    ))
-    fig.update_layout(
-        margin=dict(l=10, r=10, t=40, b=10),
-        height=140,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)'
-    )
-    return fig
+st.markdown("---")
 
-def draw_trend_chart():
-    """رسم المخطط الانسيابي الأزرق لمؤشر الالتزام (Compliance Trend)"""
-    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-    values = [45, 52, 48, 60, 72, 85]
+# 3. تقسيم الشاشة الرئيسي (يسار: الخطوات / يمين: المؤشرات الإحصائية)
+col_left, col_right = st.columns([5, 5])
+
+# --- الجانب الأيسر: الخطوات والمراحل الإنشائية ---
+with col_left:
+    st.markdown("#### 🔵 PHASE 1 : Engineering Compliance `Strict Sequential Order`")
     
-    df = pd.DataFrame({'Month': months, 'Progress': values})
+    # الخطوة 1: مكتملة
+    with st.container():
+        st.markdown("""
+        <div class="step-box">
+            <span style="color:#059669; font-weight:bold;">🟢 Step 1: Site Analysis & Zoning Regulations</span> 
+            <span style="float:right; background-color:#D1FAE5; color:#065F46; padding:2px 8px; border-radius:12px; font-size:12px;">Completed</span>
+            <p style="color:#64748B; font-size:13px; margin-top:5px;">Completed on 15 May 2025 • by Eng. Abdulla</p>
+        </div>
+        """, unsafe_allowed_html=True)
     
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df['Month'], y=df['Progress'],
-        mode='lines+markers',
-        line=dict(color='#2563EB', width=3),
-        marker=dict(size=6, color='#1D4ED8'),
-        fill='tozeroy',
-        fillcolor='rgba(37, 99, 235, 0.08)'
-    ))
-    fig.update_layout(
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=120,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(showgrid=False, zeroline=False),
-        yaxis=dict(showgrid=True, gridcolor='#E2E8F0', zeroline=False)
-    )
-    return fig
-
-# =====================================================================
-# 4. نظام إدارة اللغات والهيدر العلوي الفاخر (Header & Identity Grid)
-# =====================================================================
-
-if "lang" not in st.session_state:
-    st.session_state.lang = "ar"
-
-# صف هيدر علوي لعرض اللوغو وزر تحويل اللغة الفوري
-col_logo_area, col_lang_area = st.columns([3, 1])
-
-with col_logo_area:
-    st.image("assets/corporate_logo.jpeg")  # استدعاء لوغو الاستدامة الخضراء الأنيق
-
-with col_lang_area:
-    st.write("")
-    if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
-        st.session_state.lang = "en" if st.session_state.lang == "ar" else "ar"
-        st.rerun()
-
-lang = st.session_state.lang
-
-# قاموس الترجمة الفورية الكامل لهيدر الواجهة الإستراتيجية
-h_t = {
-    "loc_title": {"ar": "📍 موقع المشروع الحالي:", "en": "📍 Current Project Location:"},
-    "loc_val": {"ar": "بغداد", "en": "Baghdad"},
-    "pm_title": {"ar": "👤 مدير المشروع:", "en": "👤 Project Manager:"},
-    "pm_val": {"ar": "المهندس عبدالله علي", "en": "Eng. Abdulla Ali"},
-}
-
-# صف البيانات التعريفية (مقسم إلى 3 أعمدة عائمة مستديرة الحواف)
-st.write("")
-col_meta1, col_meta2, col_meta3 = st.columns(3)
-
-with col_meta1:
-    st.markdown(f"""
-    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #3B82F6;">
-        <span style="color: #64748B; font-size: 0.9rem;">{h_t["loc_title"][lang]}</span><br>
-        <strong style="color: #0F172A; font-size: 1.1rem;">{h_t["loc_val"][lang]}</strong>
+    # الخطوة 2: قيد العمل وبها ميزة رفع الملفات (Drag & Drop)
+    st.markdown('<div class="step-box step-active">', unsafe_allowed_html=True)
+    st.markdown("<span style='color:#F97316; font-weight:bold;'>🟠 Step 2: Soil Inspection & Foundations</span> <span style='float:right; background-color:#FFEDD5; color:#9A3412; padding:2px 8px; border-radius:12px; font-size:12px;'>In Progress</span>", unsafe_allowed_html=True)
+    uploaded_file = st.file_uploader("Upload (Soil Lab PDF) - Max 50MB", type=["pdf"], label_visibility="visible")
+    st.markdown('</div>', unsafe_allowed_html=True)
+    
+    # الخطوات 3 و 4 و 5: مقفلة (Locked)
+    for step_num, step_title in [("3", "Structural Audit & Load Calculations"), 
+                                 ("4", "Hydro-Sanitary & Plumbing Design"), 
+                                 ("5", "Electrical Systems Analysis")]:
+        st.markdown f"""
+        <div class="step-box" style="opacity: 0.6;">
+            <span style="color:#64748B;">🔒 Step {step_num}: {step_title}</span>
+        </div>
+        """, unsafe_allowed_html=True)
+        
+    # بنر الترقية للنسخة المدفوعة (Premium Subscription)
+    st.markdown("""
+    <div class="premium-box">
+        <h5>👑 Subscribe to Premium Pack <span style="background-color:#EAB308; color:black; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">PREMIUM</span></h5>
+        <p style="font-size:13px; color:#94A3B8;">Unlock all 14 automated compliance calculators, process soil lab data via AI, and generate legally verified PDF audit reports.</p>
+        <button style="background-color:#EAB308; border:none; color:black; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">Upgrade Now 👑</button>
     </div>
-    """, unsafe_allow_html=True)
+    """, unsafe_allowed_html=True)
 
-with col_meta2:
-    st.markdown(f"""
-    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #10B981;">
-        <span style="color: #64748B; font-size: 0.9rem;">{h_t["pm_title"][lang]}</span><br>
-        <strong style="color: #0F172A; font-size: 1.1rem;">{h_t["pm_val"][lang]}</strong>
-    </div>
-    """, unsafe_allow_html=True)
 
-with col_meta3:
-    st.markdown(f"""
-    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #6366F1; text-align: center; background-color: #EEF2F6 !important;">
-        <span style="color: #475569; font-size: 1rem; font-weight: bold;">Enterprise Portal v2.0</span>
-    </div>
-    """, unsafe_allow_html=True)
+# --- الجانب الأيمن: المؤشرات والرسوم البيانية (KPI Cards) ---
+with col_right:
+    
+    # صف المؤشرات الأول (Engineering Compliance & Structural Integrity)
+    r1_c1, r1_c2 = st.columns(2)
+    
+    with r1_c1:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🔵 1. Engineering Compliance</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3 style='margin-bottom:0;'>42%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
+        # رسم بياني خطي صغير للتطور التراكمي
+        fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=[30, 45, 40, 55, 68, 72], mode='lines+markers', line=dict(color='#2563EB', width=2)))
+        fig_line.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig_line, use_container_width=True, key="compliance_chart")
+        st.markdown('</div>', unsafe_allowed_html=True)
+        
+    with r1_c2:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🟢 2. Structural Integrity</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3 style='margin-bottom:0;'>0%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
+        # رسم بياني أعمدة لحالة الهيكل الإنشائي
+        fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[40, 40, 60, 0], marker_color='#10B981'))
+        fig_bar.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart")
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-st.divider()
+    # صف المؤشرات الثاني (Energy Optimization & Sustainability Impact)
+    r2_c1, r2_c2 = st.columns(2)
+    
+    with r2_c1:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🟢 3. Energy Optimization</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3 style='margin-bottom:0;'>0%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
+        st.markdown("<span style='color:#059669; font-weight:bold;'>27%</span> <span style='font-size:12px; color:#64748B;'>Estimated Savings</span>", unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
+        
+    with r2_c2:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🟢 4. Sustainability Impact</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3 style='margin-bottom:0; color:#059669;'>61</h3><p style='color:#64748B; font-size:12px;'>Green Score</p>", unsafe_allowed_html=True)
+        st.markdown("<span style='font-size:12px; color:#64748B;'>CO₂ Reduction Potential:</span><br><span style='font-weight:bold; color:#059669;'>128.5 Tons/Year</span>", unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# سطر تجريبي مؤقت للتأكد من ربط الهيدر واللغات بنجاح
-# =====================================================================
-# 5. قاموس الترجمة الشامل للأزرار والكتل الاستراتيجية الـ 14
-# =====================================================================
-p_t = {
-    "left_title": {"ar": "🔷 خط الإنتاج المتسلسل لمطابقة الكودات والأمان (Strict Pipeline)", "en": "🔷 Engineering Compliance & Safety (Strict Sequential Pipeline)"},
-    "right_title": {"ar": "📊 المؤشرات والتحليلات الاستراتيجية الحية للشركة (SaaS Dashboard)", "en": "📊 Live Enterprise Analytics & System Dashboards (SaaS Dashboard)"},
+    # صف المؤشرات الثالث (Cost Management & Project Timeline)
+    r3_c1, r3_c2 = st.columns(2)
     
-    # المحور الأول
-    "step1": {"ar": "✅ الخطوة 1: تحليل الموقع والمحددات البلدية (مفتوح للتجربة) ➔", "en": "✅ Step 1: Site Analysis & Zoning Regulations (Open for Demo) ➔"},
-    "step2": {"ar": "🧪 الخطوة 2: فحص التربة وتصميم الأسس 🔒", "en": "🧪 Step 2: Soil Inspection & Foundations 🔒"},
-    "step3": {"ar": "🧱 الخطوة 3: التدقيق الإنشائي وحساب الأحمال والسلامة 🔒", "en": "🧱 Step 3: Structural Audit & Load Calculations 🔒"},
-    "step4": {"ar": "🚰 الخطوة 4: هندسة التأسيسات الصحية والمائية 🔒", "en": "🚰 Step 4: Hydro-Sanitary & Plumbing Design 🔒"},
-    "step5": {"ar": "⚡ الخطوة 5: هندسة التأسيسات الكهربائية وموازنة الأحمال 🔒", "en": "⚡ Step 5: Electrical Systems Analysis 🔒"},
-    
-    # المحور الثاني
-    "step6": {"ar": "❄️ الخطوة 6: حسابات العزل الحراري وغلاف المبنى 🔒", "en": "❄️ Step 6: Thermal Insulation & Building Envelope 🔒"},
-    "step7": {"ar": "💨 الخطوة 7: تخمين أحمال التكييف وتصميم المنظومات 🔒", "en": "💨 Step 7: HVAC Load Estimation & System Design 🔒"},
-    "step8": {"ar": "💰 الخطوة 8: حاسبة كلف التشغيل وفترة استرداد رأس المال 🔒", "en": "💰 Step 8: Operational Cost & ROI Calculator 🔒"},
-    
-    # كتل الاشتراكات وباقي الخدمات
-    "premium_title": {"ar": "👑 اشترك في الباقة الفاخرة لتفعيل الـ 14 برنامجاً بالكامل", "en": "👑 Subscribe to Premium Pack (PREMIUM)"},
-    "premium_desc": {"ar": "قم بفتح كافة الحواسب والمحركات البرمجية والتدقيق الذكي، مع إصدار شهادات الـ PDF المشفرة بالـ QR وصحة الصدور.", "en": "Unlock all 14 automated compliance calculators, process soil lab data via AI, and generate legally verified PDF audit reports with secure QR Code verification."},
-    "premium_btn": {"ar": "الاشتراك الآن ⚡", "en": "Upgrade Now 👑"},
-}
+    with r3_c1:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🟣 5. Cost Management</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3>18%</h3>", unsafe_allowed_html=True)
+        st.progress(0.18)
+        st.markdown("<p style='font-size:12px; color:#64748B; margin-top:5px;'>Budget Overview:<br><b>$1.28M</b> / $7.00M</p>", unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
+        
+    with r3_c2:
+        st.markdown('<div class="card">', unsafe_allowed_html=True)
+        st.markdown("<h6>🔵 6. Project Timeline</h6>", unsafe_allowed_html=True)
+        st.markdown("<h3>14%</h3>", unsafe_allowed_html=True)
+        st.progress(0.14)
+        st.markdown("<p style='font-size:12px; color:#64748B; margin-top:5px;'>Project Duration:<br><b>42</b> / 300 Days</p>", unsafe_allowed_html=True)
+        st.markdown('</div>', unsafe_allowed_html=True)
 
-# =====================================================================
-# 6. تقسيم وتوزيع فضاء الشاشة الكلية إلى العمودين الرئيسيين
-# =====================================================================
-col_left_main, col_right_main = st.columns([1.1, 0.9]) # توزيع هندسي متوازن بالملي 
+st.markdown("---")
 
-with col_left_main:
-    st.markdown(f"### {p_t['left_title'][lang]}")
-    
-    # عرض خط إنتاج المحور الأول
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    prog1 = st.button(p_t["step1"][lang], use_container_width=True)
-    prog2 = st.button(p_t["step2"][lang], use_container_width=True)
-    prog3 = st.button(p_t["step3"][lang], use_container_width=True)
-    prog4 = st.button(p_t["step4"][lang], use_container_width=True)
-    prog5 = st.button(p_t["step5"][lang], use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # عرض خط إنتاج المحور الثاني
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    prog6 = st.button(p_t["step6"][lang], use_container_width=True)
-    prog7 = st.button(p_t["step7"][lang], use_container_width=True)
-    prog8 = st.button(p_t["step8"][lang], use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # حاوية وبانر الاشتراك المالي المدفوع للشركة وحماية الأرباح
-    st.markdown(f"""
-    <div class="premium-banner">
-        <h3 style="color: white; margin-top: 0;">{p_t["premium_title"][lang]}</h3>
-        <p style="color: #93C5FD; font-size: 0.95rem;">{p_t["premium_desc"][lang]}</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.write("")
-    st.button(p_t["premium_btn"][lang], type="primary", use_container_width=True)
-
-with col_right_main:
-    st.markdown(f"### {p_t['right_title'][lang]}")
-    
-    # سطر تجريبي مؤقت بداخل العمود الأيمن سيتم ملؤه بالعدادات الستة فوراً في الجزء القادم
-    st.write("فضاء العدادات والمؤشرات الستة الملونة جاهز للاستقبال...")
+# 4. شريط الميزات السفلي الفوتر (Footer Features)
+f1, f2, f3, f4 = st.columns(4)
+f1.markdown("🛡️ **Secure & Sovereign**<br><span style='font-size:12px; color:#64748B;'>End-to-end data protection with local compliance</span>", unsafe_allowed_html=True)
+f2.markdown("🧠 **AI-Powered Analytics**<br><span style='font-size:12px; color:#64748B;'>Smarter insights for better construction decisions</span>", unsafe_allowed_html=True)
+f3.markdown("✅ **Regulatory Compliance**<br><span style='font-size:12px; color:#64748B;'>Aligned with national & international green building standards</span>", unsafe_allowed_html=True)
+f4.markdown("🎧 **Expert Support**<br><span style='font-size:12px; color:#64748B;'>Dedicated engineering support team</span>", unsafe_allowed_html=True)
