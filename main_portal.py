@@ -102,5 +102,63 @@ def draw_trend_chart():
     )
     return fig
 
-# سطر تجريبي مؤقت للتأكد من ربط محرك الرسوم البيانية بنجاح
-st.write("تم تحميل محرك الرسوم البيانية والجارتات بنجاح...")
+# =====================================================================
+# 4. نظام إدارة اللغات والهيدر العلوي الفاخر (Header & Identity Grid)
+# =====================================================================
+
+if "lang" not in st.session_state:
+    st.session_state.lang = "ar"
+
+# صف هيدر علوي لعرض اللوغو وزر تحويل اللغة الفوري
+col_logo_area, col_lang_area = st.columns([3, 1])
+
+with col_logo_area:
+    st.image("assets/corporate_logo.jpeg")  # استدعاء لوغو الاستدامة الخضراء الأنيق
+
+with col_lang_area:
+    st.write("")
+    if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
+        st.session_state.lang = "en" if st.session_state.lang == "ar" else "ar"
+        st.rerun()
+
+lang = st.session_state.lang
+
+# قاموس الترجمة الفورية الكامل لهيدر الواجهة الإستراتيجية
+h_t = {
+    "loc_title": {"ar": "📍 موقع المشروع الحالي:", "en": "📍 Current Project Location:"},
+    "loc_val": {"ar": "بغداد", "en": "Baghdad"},
+    "pm_title": {"ar": "👤 مدير المشروع:", "en": "👤 Project Manager:"},
+    "pm_val": {"ar": "المهندس عبدالله علي", "en": "Eng. Abdulla Ali"},
+}
+
+# صف البيانات التعريفية (مقسم إلى 3 أعمدة عائمة مستديرة الحواف)
+st.write("")
+col_meta1, col_meta2, col_meta3 = st.columns(3)
+
+with col_meta1:
+    st.markdown(f"""
+    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #3B82F6;">
+        <span style="color: #64748B; font-size: 0.9rem;">{h_t["loc_title"][lang]}</span><br>
+        <strong style="color: #0F172A; font-size: 1.1rem;">{h_t["loc_val"][lang]}</strong>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_meta2:
+    st.markdown(f"""
+    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #10B981;">
+        <span style="color: #64748B; font-size: 0.9rem;">{h_t["pm_title"][lang]}</span><br>
+        <strong style="color: #0F172A; font-size: 1.1rem;">{h_t["pm_val"][lang]}</strong>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_meta3:
+    st.markdown(f"""
+    <div class="dashboard-card" style="padding: 1rem; border-right: 4px solid #6366F1; text-align: center; background-color: #EEF2F6 !important;">
+        <span style="color: #475569; font-size: 1rem; font-weight: bold;">Enterprise Portal v2.0</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.divider()
+
+# سطر تجريبي مؤقت للتأكد من ربط الهيدر واللغات بنجاح
+st.write("تم تحميل الهيدر العلوي وصف الهوية بنجاح...")
