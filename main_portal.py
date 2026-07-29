@@ -4,10 +4,12 @@ import pandas as pd
 from shared_utils.engines.engineering_compliance_engine import verify_soil_report
 from shared_utils.engines.energy_sustainability_engine import calculate_energy_roi
 from shared_utils.engines.data_anonymizer import anonymize_owner_data, get_provincial_green_stats
+# استدعاء ملف التحقق من الهويات الجديد
+from shared_utils.rbac_rules import verify_engineer_with_syndicate, get_role_permissions
 
 st.set_page_config(page_title="Iraqi Green Construction", page_icon="🏗️", layout="wide")
 
-# تهيئة الذاكرة بطريقة رياضية آمنة تمنع الحذف والـ SyntaxError
+# تهيئة المتغيرات الرقمية والمنطقية الصريحة لمنع الـ AttributeError والـ SyntaxError
 if "step2_completed" not in st.session_state:
     st.session_state["step2_completed"] = False
 if "compliance_rate" not in st.session_state:
@@ -26,10 +28,13 @@ if "val6" not in st.session_state:
     st.session_state["val6"] = 42
 if "soil_results" not in st.session_state:
     st.session_state["soil_results"] = None
+if "is_verified_engineer" not in st.session_state:
+    st.session_state["is_verified_engineer"] = False
 
 theme_css = """
 <style>
     .stApp { background-color: #F8FAFC !important; }
+    .card { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; height: 100%; }
     .step-box { border: 1px solid #E2E8F0; padding: 15px; border-radius: 10px; margin-bottom: 12px; background-color: #F8FAFC; }
     .step-active { border: 1px solid #FFEDD5; background-color: #FFFFf0; border-left: 5px solid #F97316; padding: 15px; border-radius: 10px; margin-bottom: 12px; }
     .step-done { border: 1px solid #D1FAE5; background-color: #F0FDF4; border-left: 5px solid #10B981; padding: 15px; border-radius: 10px; margin-bottom: 12px; }
@@ -46,7 +51,17 @@ st.html(theme_css)
 
 with st.sidebar:
     st.markdown("### 🗺️ بوابات المنصة")
-    app_mode = st.radio("اختر الواجهة المطلوبة:", ["Dashboard", "Energy ROI", "Cloud Aggregation"])
+    app_mode = st.radio(
+        "اختر الواجهة المطلوبة:",
+        [
+            "Dashboard", 
+            "Energy ROI", 
+            "Cloud Aggregation",
+            "Engineer Verification"
+        ]
+    )
+    st.markdown("---")
+    st.caption("المنصة العراقية الموحدة للبناء الأخضر لعام 2026")
 
 with st.container():
     col1, col2, col3 = st.columns(3)
@@ -54,7 +69,7 @@ with st.container():
     col2.markdown("**📍 Location:** Baghdad")
     col3.markdown("**👨‍💼 Manager:** Eng. Abdulla")
 st.markdown("---")
-# --- Part 2: Dynamic Interfaces & Layout Logic (Strict Syntactic Check) ---
+# --- Part 2: Dynamic Interfaces & Layout Logic (Section A) ---
 
 if app_mode == "Dashboard":
     col_left, col_right = st.columns(2)
@@ -126,7 +141,6 @@ if app_mode == "Dashboard":
             with st.container(border=True):
                 st.html("<div class='card-title'>🟢 2. Structural Integrity</div>")
                 st.html("<div class='card-value'>0%</div>")
-                # تم معالجة مصفوفة الهيكل الإنشائي برمجياً لتجنب الحذف تماماً
                 structural_list = list(map(int, "0000"))
                 fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=structural_list, marker_color='#10B981'))
                 fig_bar.update_layout(margin=dict(l=5,r=5,t=5,b=5), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
@@ -166,8 +180,9 @@ elif app_mode == "Energy ROI":
                     <p style="font-size:16px; font-weight:bold; color:#1D4ED8; margin:5px 0;">فترة استرداد رأس المال: {results.get('payback_years', 0)} سنة</p>
                 </div>
                 """)
+# --- Part 2: Dynamic Interfaces & Layout Logic (Section B) ---
 
-else:
+elif app_mode == "Cloud Aggregation":
     st.markdown("### ☁️ بوابة السحابة المركزية ومجمّع المؤشرات الوطنية")
     col_mask, col_stats = st.columns(2)
     with col_mask:
@@ -197,6 +212,49 @@ else:
             ))
             fig_prov.update_layout(title="ترتيب المحافظات الأعلى وفراً للكربون لعام 2026", margin=dict(l=20, r=20, t=40, b=20), height=220, plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_prov, use_container_width=True, config={'displayModeBar': False})
+
+else:
+    # عرض بوابة التحقق الرقمي والتوثيق من نقابة المهندسين (Engineer Verification)
+    st.markdown("### 🔐 بوابة التوثيق الرقمي وإدارة الصلاحيات السيادية")
+    st.info("تتيح هذه البوابة التحقق التلقائي من حالة انتساب المهندسين وتخصيص رتب الاستخدام.")
+    
+    col_auth, col_perm = st.columns(2)
+    with col_auth:
+        with st.container(border=True):
+            st.markdown("#### 🆔 فحص الهوية النقابية الموحدة")
+            eng_id = st.text_input("أدخل رقم عضوية نقابة المهندسين (جرب: 12345 أو 67890):", value="12345")
+            role = st.selectbox("رتبة المستخدم المطلوبة بالمشروع:", ["Project Manager", "Auditor / Consultant", "Guest / Investor"])
+            auth_btn = st.button("🔐 التحقق ومنح الصلاحيات السحابية", type="primary")
+            
+            if auth_btn:
+                auth_res = verify_engineer_with_syndicate(eng_id)
+                if auth_res["verified"]:
+                    st.success(auth_res["message"])
+                    st.session_state["is_verified_engineer"] = True
+                else:
+                    st.error(auth_res["message"])
+                    st.session_state["is_verified_engineer"] = False
+
+    with col_perm:
+        with st.container(border=True):
+            st.markdown("#### 📜 مصفوفة صلاحيات الرتبة الحالية")
+            perms = get_role_permissions(role)
+            
+            st.write(f"💼 الرتبة الهندسية المحددة: **{role}**")
+            st.markdown("---")
+            
+            if perms.get("upload_docs"):
+                st.markdown("🍏 **صلاحية رفع وثائق المشروع والتربة:** مسموح")
+            else:
+                st.markdown("🔴 **صلاحية رفع وثائق المشروع والتربة:** غير مسموح لك")
+                
+            if perms.get("run_calculators"):
+                st.markdown("🍏 **صلاحية تشغيل الحسابات الهندسية ومطابقة الكود:** مسموح")
+            else:
+                st.markdown("🔴 **صلاحية تشغيل الحسابات الهندسية ومطابقة الكود:** غير مسموح لك")
+                
+            if perms.get("view_analytics"):
+                st.markdown("🍏 **صلاحية استعراض لوحات القيادة والإحصاءات:** مسموح للجميع")
 
 st.markdown("---")
 st.caption("🛡️ Secure & Sovereign | 🧠 AI-Powered Analytics | ✅ Regulatory Compliance")
