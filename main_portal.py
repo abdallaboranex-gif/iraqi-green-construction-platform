@@ -9,8 +9,10 @@ if "lang" not in st.session_state:
 
 col_logo, col_lang = st.columns(2)
 with col_lang:
+    # تم تعديل المنطق هنا لإجبار السيرفر على التحديث اللحظي من الضغطة الأولى
     if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
         st.session_state.lang = "en" if st.session_state.lang == "ar" else "ar"
+        st.rerun()  # حلقة التحديث الفوري للمتصفح دون تأخير 🆕
 
 # قاموس المصطلحات الشامل والمحدث لجميع الأزرار والبرامج بالكامل
 t = {
@@ -25,7 +27,7 @@ t = {
     
     # ترجمة أزرار المحور الأول
     "prog1": {"ar": "🏢 البرنامج 1: تحليل الموقع والمحددات البلدية (مفتوح للتجربة) ➔", "en": "🏢 Program 1: Site Analysis & Zoning Regulations (Open for Demo) ➔"},
-    "prog2": {"ar": "🧪 البرنامج 2: fحص التربة وتصميم الأسس 🔒", "en": "🧪 Program 2: Geotechnical Inspection & Foundation Design 🔒"},
+    "prog2": {"ar": "🧪 البرنامج 2: فحص التربة وتصميم الأسس 🔒", "en": "🧪 Program 2: Geotechnical Inspection & Foundation Design 🔒"},
     "prog3": {"ar": "🧱 البرنامج 3: التدقيق الإنشائي وحساب الأحمال والسلامة 🔒", "en": "🧱 Program 3: Structural Audit & Load Calculations 🔒"},
     "prog4": {"ar": "🚰 البرنامج 4: هندسة التأسيسات الصحية والمائية 🔒", "en": "🚰 Program 4: Hydro-Sanitary & Plumbing Design 🔒"},
     "prog5": {"ar": "⚡ البرنامج 5: هندسة التأسيسات الكهربائية 🔒", "en": "⚡ Program 5: Electrical Systems Analysis 🔒"},
@@ -58,7 +60,7 @@ with col_meta3: st.button(t["upgrade_btn"][lang], type="primary", use_container_
 
 st.divider()
 
-# 4. أزرار البرامج الـ 14 (تم ربطها ديناميكياً بقاموس اللغات هنا)
+# 4. أزرار البرامج الـ 14
 st.markdown(f"### {t['axis1'][lang]}")
 prog1 = st.button(t["prog1"][lang], use_container_width=True)
 prog2 = st.button(t["prog2"][lang], use_container_width=True)
