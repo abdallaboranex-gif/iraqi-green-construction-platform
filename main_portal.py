@@ -1,9 +1,9 @@
 import streamlit as st
 
-# 1. إعدادات المظهر البصري وهوية الشركة الاستشارية
+# 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. حقن ثيم الـ CSS لدمج الخلفية واللوغو والخطوط من داخل الملف مباشرة
+# 2. حقن ثيم الـ CSS المتطور (إصلاح مسار الخلفية وتصغير اللوغو للأبد)
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -12,16 +12,24 @@ st.markdown("""
         font-family: 'Tajawal', sans-serif !important;
     }
     
-    /* ربط الخلفية الملكية المرفوعة بداخل مجلد assets لتغطي كامل الشاشة */
+    /* حل مشكلة الخلفية: جلب الصورة مباشرة لملء كامل الشاشة بنقاء */
     .stApp {
-        background: linear-gradient(rgba(10, 37, 64, 0.45), rgba(10, 37, 64, 0.45)), 
-                    url('app/static/assets/cloud_grid_bg.jpeg');
+        background: linear-gradient(rgba(10, 37, 64, 0.65), rgba(10, 37, 64, 0.65)), 
+                    url('https://githubusercontent.com');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
     
-    /* تنسيق الحاويات العائمة للأزرار لتبدو فاخرة وعصرية */
+    /* تصغير وتنسيق حاوية اللوغو ليكون أنيقاً وفي الزاوية وبحجم 180 بكسل فقط */
+    [data-testid="stImage"] img {
+        width: 180px !important;
+        height: auto !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* تنسيق الحاويات العائمة للأزرار والبرامج */
     .axis-container {
         background-color: rgba(255, 255, 255, 0.95);
         padding: 1.75rem;
@@ -50,7 +58,7 @@ st.markdown("""
         margin-bottom: 1.25rem;
     }
 
-    /* أزرار الخدمات والبرامج الفاخرة */
+    /* أزرار الخدمات الفاخرة الممتدة */
     div.stButton > button {
         background-color: #FFFFFF !important;
         color: #334155 !important;
@@ -78,11 +86,10 @@ st.markdown("""
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة
+# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بشكل متوازن ومريح للعين
 col_logo_img, col_empty, col_lang = st.columns([2, 5, 2])
 with col_logo_img:
-    # استدعاء وعرض اللوغو الحقيقي لشركة الاستدامة الخضراء من مجلد الأصول
-    st.image("assets/corporate_logo.jpeg", use_container_width=True)
+    st.image("assets/corporate_logo.jpeg")
 
 with col_lang:
     if st.button("🌐 EN" if st.session_state.lang == "ar" else "🌐 العربية", use_container_width=True):
@@ -112,9 +119,9 @@ t = {
 }
 lang = st.session_state.lang
 
-# 4. تصفيف نصوص العناوين الرئيسية فوق الخلفية الفاخرة
-st.title(t["title"][lang])
-st.write(f"**{t['subtitle'][lang]}**")
+# 4. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
+st.markdown(f'<h1 style="color: white; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
+st.markdown(f'<p style="color: #E2E8F0; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
 
 col_meta1, col_meta2, col_meta3 = st.columns(3)
 with col_meta1: st.info(t["project_loc"][lang])
@@ -140,9 +147,8 @@ prog7 = st.button(t["prog7"][lang], use_container_width=True)
 prog8 = st.button(t["prog8"][lang], use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 6. إطلاق رسالة القفل المالي والاشتراكات عند الضغط على الأزرار المحمية
+# 6. إطلاق رسالة القفل المالي عند الضغط على الأزرار المحمية
 if prog1:
     st.toast("🚀 Open Program 1 UI..." if lang == "en" else "🚀 جاري فتح واجهة البرنامج 1...")
-    # هنا سيتم لاحقاً وضع التوجيه الرسمي لصفحة الفحص المعزولة
 if prog2 or prog3 or prog4 or prog5 or prog6 or prog7 or prog8:
     st.error(t["locked_msg"][lang])
