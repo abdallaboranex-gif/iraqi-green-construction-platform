@@ -3,7 +3,7 @@ import streamlit as st
 # 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. حقن ثيم الـ CSS المتطور (إصلاح مسار الخلفية وتصغير اللوغو للأبد)
+# 2. حقن ثيم الـ CSS المتطور (استخدام الرابط الخام الصحيح لملء الشاشة بالخلفية)
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -12,16 +12,16 @@ st.markdown("""
         font-family: 'Tajawal', sans-serif !important;
     }
     
-    /* حل مشكلة الخلفية: جلب الصورة مباشرة لملء كامل الشاشة بنقاء */
+    /* إصلاح مسار الخلفية السحابية باستخدام رابط الملفات الخام المضمون لغيت هاب */
     .stApp {
-        background: linear-gradient(rgba(10, 37, 64, 0.65), rgba(10, 37, 64, 0.65)), 
+        background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
                     url('https://githubusercontent.com');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
     
-    /* تصغير وتنسيق حاوية اللوغو ليكون أنيقاً وفي الزاوية وبحجم 180 بكسل فقط */
+    /* تنسيق حاوية اللوغو ليكون أنيقاً وفي الزاوية بحجم متناسق */
     [data-testid="stImage"] img {
         width: 180px !important;
         height: auto !important;
@@ -29,7 +29,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* تنسيق الحاويات العائمة للأزرار والبرامج */
+    /* تنسيق الحاويات العائمة للأزرار والبرامج الـ 14 */
     .axis-container {
         background-color: rgba(255, 255, 255, 0.95);
         padding: 1.75rem;
@@ -58,7 +58,7 @@ st.markdown("""
         margin-bottom: 1.25rem;
     }
 
-    /* أزرار الخدمات الفاخرة الممتدة */
+    /* أزرار الخدمات والبرامج الممتدة الفاخرة */
     div.stButton > button {
         background-color: #FFFFFF !important;
         color: #334155 !important;
@@ -86,8 +86,8 @@ st.markdown("""
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بشكل متوازن ومريح للعين
-col_logo_img, col_empty, col_lang = st.columns([2, 5, 2])
+# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بشكل متوازن
+col_logo_img, col_empty, col_lang = st.columns(3)
 with col_logo_img:
     st.image("assets/corporate_logo.jpeg")
 
@@ -130,7 +130,7 @@ with col_meta3: st.button(t["upgrade_btn"][lang], type="primary", use_container_
 
 st.divider()
 
-# 5. عرض كتل المحاور الستة كحاويات عائمة أنيقة فوق الخلفية الملكية
+# 5. عرض كتل المحاور كحاويات عائمة أنيقة فوق الخلفية الملكية
 # المحور الأول
 st.markdown(f'<div class="axis-container"><div class="axis-title-1">{t["axis1"][lang]}</div>', unsafe_allow_html=True)
 prog1 = st.button(t["prog1"][lang], use_container_width=True)
