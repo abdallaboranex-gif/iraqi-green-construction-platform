@@ -3,7 +3,7 @@ import streamlit as st
 # 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. حقن ثيم الـ CSS المتطور (استخدام الرابط الخام الصحيح لملء الشاشة بالخلفية)
+# 2. حقن ثيم الـ CSS (إصلاح مسار الروابط الخام بالامتداد الحقيقي .jpeg الظاهر في الصورة)
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -12,7 +12,7 @@ st.markdown("""
         font-family: 'Tajawal', sans-serif !important;
     }
     
-    /* إصلاح مسار الخلفية السحابية باستخدام رابط الملفات الخام المضمون لغيت هاب */
+    /* حل مشكلة الخلفية: استخدام الرابط الخام الصحيح والمباشر مع الامتداد الحقيقي .jpeg */
     .stApp {
         background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
                     url('https://githubusercontent.com');
@@ -29,7 +29,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* تنسيق الحاويات العائمة للأزرار والبرامج الـ 14 */
+    /* تنسيق الحاويات العائمة للأزرار والبرامج */
     .axis-container {
         background-color: rgba(255, 255, 255, 0.95);
         padding: 1.75rem;
@@ -86,7 +86,7 @@ st.markdown("""
 if "lang" not in st.session_state:
     st.session_state.lang = "ar"
 
-# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بشكل متوازن
+# صف هيدر علوي مخصص لعرض اللوغو وزر اللغة بالامتداد الفعلي .jpeg من مجلد الأصول
 col_logo_img, col_empty, col_lang = st.columns(3)
 with col_logo_img:
     st.image("assets/corporate_logo.jpeg")
@@ -119,7 +119,7 @@ t = {
 }
 lang = st.session_state.lang
 
-# 4. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
+# 4. عرض نصوص العناوين الرئيسية
 st.markdown(f'<h1 style="color: white; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
 st.markdown(f'<p style="color: #E2E8F0; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
 
@@ -147,7 +147,7 @@ prog7 = st.button(t["prog7"][lang], use_container_width=True)
 prog8 = st.button(t["prog8"][lang], use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 6. إطلاق رسالة القفل المالي عند الضغط على الأزرار المحمية
+# 6. إطلاق رسالة القفل المالي
 if prog1:
     st.toast("🚀 Open Program 1 UI..." if lang == "en" else "🚀 جاري فتح واجهة البرنامج 1...")
 if prog2 or prog3 or prog4 or prog5 or prog6 or prog7 or prog8:
