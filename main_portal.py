@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 # 1. إعدادات الصفحة وهوية المنصة البصرية
 st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏗️", layout="wide")
 
-# تصميم الأسلوب المرئي وحل مشكلة التعارض البرمجي بطريقة معزولة
+# تصميم الأسلوب المرئي وحقن التنسيقات بشكل آمن ومتوافق مع تحديثات 2026
 theme_css = """
 <style>
     .stApp { background-color: #F8FAFC !important; }
@@ -13,11 +13,15 @@ theme_css = """
     .step-box { border: 1px solid #E2E8F0; padding: 15px; border-radius: 10px; margin-bottom: 12px; background-color: #F8FAFC; }
     .step-active { border: 1px solid #FFEDD5; background-color: #FFFFf0; border-left: 5px solid #F97316; }
     .premium-box { background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
+    .green-text { color: #059669; font-weight: bold; }
+    .gray-text { color: #64748B; }
+    .completed-badge { float: right; background-color: #D1FAE5; color: #065F46; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+    .progress-badge { float: right; background-color: #FFEDD5; color: #9A3412; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
 </style>
 """
 st.html(theme_css)
 
-# 2. الهيدر العلوي (Header)
+# 2. الهيدر العلوي (Header) مبرمج بدوال نظيفة خالية من الـ HTML المتعارض
 with st.container():
     col_logo, col_lang, col_loc, col_user = st.columns(4)
     with col_logo:
@@ -26,9 +30,11 @@ with st.container():
     with col_lang:
         st.segmented_control("Language", ["العربية", "EN"], default="EN", label_visibility="collapsed")
     with col_loc:
-        st.markdown("**📍 Current Project Location:**<br><span style='color:#059669; font-weight:bold;'>Baghdad</span>", unsafe_allowed_html=True)
+        st.markdown("**📍 Current Project Location:**")
+        st.html("<span class='green-text'>Baghdad</span>")
     with col_user:
-        st.markdown("**👨‍💼 Eng. Abdulla**<br><span style='color:#64748B;'>Project Manager</span>", unsafe_allowed_html=True)
+        st.markdown("**👨‍💼 Eng. Abdulla**")
+        st.html("<span class='gray-text'>Project Manager</span>")
 
 st.markdown("---")
 
@@ -40,17 +46,17 @@ with col_left:
     st.markdown("#### 🔵 PHASE 1 : Engineering Compliance `Strict Sequential Order`")
     
     # الخطوة 1: مكتملة
-    st.markdown("""
+    st.html("""
     <div class="step-box">
         <span style="color:#059669; font-weight:bold;">🟢 Step 1: Site Analysis & Zoning Regulations</span> 
-        <span style="float:right; background-color:#D1FAE5; color:#065F46; padding:2px 8px; border-radius:12px; font-size:12px;">Completed</span>
+        <span class="completed-badge">Completed</span>
         <p style="color:#64748B; font-size:13px; margin-top:5px;">Completed on 15 May 2025 • by Eng. Abdulla</p>
     </div>
-    """, unsafe_allowed_html=True)
+    """)
     
-    # الخطوة 2: قيد العمل وبها ميزة رفع الملفات (Drag & Drop)
+    # الخطوة 2: قيد العمل وبها ميزة رفع الملفات التفاعلية
     st.markdown('<div class="step-box step-active">', unsafe_allowed_html=True)
-    st.markdown("<span style='color:#F97316; font-weight:bold;'>🟠 Step 2: Soil Inspection & Foundations</span> <span style='float:right; background-color:#FFEDD5; color:#9A3412; padding:2px 8px; border-radius:12px; font-size:12px;'>In Progress</span>", unsafe_allowed_html=True)
+    st.html("<span style='color:#F97316; font-weight:bold;'>¼ Step 2: Soil Inspection & Foundations</span> <span class='progress-badge'>In Progress</span>")
     uploaded_file = st.file_uploader("Upload (Soil Lab PDF) - Max 50MB", type=["pdf"], label_visibility="visible")
     st.markdown('</div>', unsafe_allowed_html=True)
     
@@ -66,16 +72,16 @@ with col_left:
             <span style="color:#64748B;">🔒 Step {num}: {title}</span>
         </div>
         """
-        st.markdown(html_code, unsafe_allowed_html=True)
+        st.html(html_code)
         
     # بنر الترقية للنسخة المدفوعة (Premium Subscription)
-    st.markdown("""
+    st.html("""
     <div class="premium-box">
         <h5>👑 Subscribe to Premium Pack <span style="background-color:#EAB308; color:black; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">PREMIUM</span></h5>
         <p style="font-size:13px; color:#94A3B8;">Unlock all 14 automated compliance calculators, process soil lab data via AI, and generate legally verified PDF audit reports.</p>
         <button style="background-color:#EAB308; border:none; color:black; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">Upgrade Now 👑</button>
     </div>
-    """, unsafe_allowed_html=True)
+    """)
 
 
 # --- الجانب الأيمن: المؤشرات والرسوم البيانية (KPI Cards) ---
@@ -88,8 +94,8 @@ with col_right:
         st.markdown('<div class="card">', unsafe_allowed_html=True)
         st.markdown("<h6>🔵 1. Engineering Compliance</h6>", unsafe_allowed_html=True)
         st.markdown("<h3 style='margin-bottom:0;'>42%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
-        # رسم بياني خطي صغير للتطور التراكمي
-        fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=[30, 35, 40, 52, 60, 85], mode='lines+markers', line=dict(color='#2563EB', width=2)))
+        # رسم بياني خطي صغير للتطور التراكمي للبيانات
+        fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=[20, 25, 30, 45, 60, 75], mode='lines+markers', line=dict(color='#2563EB', width=2)))
         fig_line.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_line, use_container_width=True, key="compliance_chart")
         st.markdown('</div>', unsafe_allowed_html=True)
@@ -99,7 +105,7 @@ with col_right:
         st.markdown("<h6>🟢 2. Structural Integrity</h6>", unsafe_allowed_html=True)
         st.markdown("<h3 style='margin-bottom:0;'>0%</h3><p style='color:#64748B; font-size:12px;'>Overall Progress</p>", unsafe_allowed_html=True)
         # رسم بياني أعمدة لحالة الهيكل الإنشائي
-        fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[10, 30, 45, 70], marker_color='#10B981'))
+        fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[0, 10, 40, 90], marker_color='#10B981'))
         fig_bar.update_layout(margin=dict(l=10,r=10,t=10,b=10), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart")
         st.markdown('</div>', unsafe_allowed_html=True)
@@ -144,7 +150,14 @@ st.markdown("---")
 
 # 4. شريط الميزات السفلي الفوتر (Footer Features)
 f1, f2, f3, f4 = st.columns(4)
-f1.markdown("🛡️ **Secure & Sovereign**<br><span style='font-size:12px; color:#64748B;'>End-to-end data protection with local compliance</span>", unsafe_allowed_html=True)
-f2.markdown("🧠 **AI-Powered Analytics**<br><span style='font-size:12px; color:#64748B;'>Smarter insights for better construction decisions</span>", unsafe_allowed_html=True)
-f3.markdown("✅ **Regulatory Compliance**<br><span style='font-size:12px; color:#64748B;'>Aligned with national & international green building standards</span>", unsafe_allowed_html=True)
-f4.markdown("🎧 **Expert Support**<br><span style='font-size:12px; color:#64748B;'>Dedicated engineering support team</span>", unsafe_allowed_html=True)
+f1.markdown("🛡️ **Secure & Sovereign**")
+f1.caption("End-to-end data protection with local compliance")
+
+f2.markdown("🧠 **AI-Powered Analytics**")
+f2.caption("Smarter insights for better construction decisions")
+
+f3.markdown("✅ **Regulatory Compliance**")
+f3.caption("Aligned with national & international green building standards")
+
+f4.markdown("🎧 **Expert Support**")
+f4.caption("Dedicated engineering support team")
