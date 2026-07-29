@@ -161,4 +161,67 @@ with col_meta3:
 st.divider()
 
 # سطر تجريبي مؤقت للتأكد من ربط الهيدر واللغات بنجاح
-st.write("تم تحميل الهيدر العلوي وصف الهوية بنجاح...")
+# =====================================================================
+# 5. قاموس الترجمة الشامل للأزرار والكتل الاستراتيجية الـ 14
+# =====================================================================
+p_t = {
+    "left_title": {"ar": "🔷 خط الإنتاج المتسلسل لمطابقة الكودات والأمان (Strict Pipeline)", "en": "🔷 Engineering Compliance & Safety (Strict Sequential Pipeline)"},
+    "right_title": {"ar": "📊 المؤشرات والتحليلات الاستراتيجية الحية للشركة (SaaS Dashboard)", "en": "📊 Live Enterprise Analytics & System Dashboards (SaaS Dashboard)"},
+    
+    # المحور الأول
+    "step1": {"ar": "✅ الخطوة 1: تحليل الموقع والمحددات البلدية (مفتوح للتجربة) ➔", "en": "✅ Step 1: Site Analysis & Zoning Regulations (Open for Demo) ➔"},
+    "step2": {"ar": "🧪 الخطوة 2: فحص التربة وتصميم الأسس 🔒", "en": "🧪 Step 2: Soil Inspection & Foundations 🔒"},
+    "step3": {"ar": "🧱 الخطوة 3: التدقيق الإنشائي وحساب الأحمال والسلامة 🔒", "en": "🧱 Step 3: Structural Audit & Load Calculations 🔒"},
+    "step4": {"ar": "🚰 الخطوة 4: هندسة التأسيسات الصحية والمائية 🔒", "en": "🚰 Step 4: Hydro-Sanitary & Plumbing Design 🔒"},
+    "step5": {"ar": "⚡ الخطوة 5: هندسة التأسيسات الكهربائية وموازنة الأحمال 🔒", "en": "⚡ Step 5: Electrical Systems Analysis 🔒"},
+    
+    # المحور الثاني
+    "step6": {"ar": "❄️ الخطوة 6: حسابات العزل الحراري وغلاف المبنى 🔒", "en": "❄️ Step 6: Thermal Insulation & Building Envelope 🔒"},
+    "step7": {"ar": "💨 الخطوة 7: تخمين أحمال التكييف وتصميم المنظومات 🔒", "en": "💨 Step 7: HVAC Load Estimation & System Design 🔒"},
+    "step8": {"ar": "💰 الخطوة 8: حاسبة كلف التشغيل وفترة استرداد رأس المال 🔒", "en": "💰 Step 8: Operational Cost & ROI Calculator 🔒"},
+    
+    # كتل الاشتراكات وباقي الخدمات
+    "premium_title": {"ar": "👑 اشترك في الباقة الفاخرة لتفعيل الـ 14 برنامجاً بالكامل", "en": "👑 Subscribe to Premium Pack (PREMIUM)"},
+    "premium_desc": {"ar": "قم بفتح كافة الحواسب والمحركات البرمجية والتدقيق الذكي، مع إصدار شهادات الـ PDF المشفرة بالـ QR وصحة الصدور.", "en": "Unlock all 14 automated compliance calculators, process soil lab data via AI, and generate legally verified PDF audit reports with secure QR Code verification."},
+    "premium_btn": {"ar": "الاشتراك الآن ⚡", "en": "Upgrade Now 👑"},
+}
+
+# =====================================================================
+# 6. تقسيم وتوزيع فضاء الشاشة الكلية إلى العمودين الرئيسيين
+# =====================================================================
+col_left_main, col_right_main = st.columns([1.1, 0.9]) # توزيع هندسي متوازن بالملي 
+
+with col_left_main:
+    st.markdown(f"### {p_t['left_title'][lang]}")
+    
+    # عرض خط إنتاج المحور الأول
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+    prog1 = st.button(p_t["step1"][lang], use_container_width=True)
+    prog2 = st.button(p_t["step2"][lang], use_container_width=True)
+    prog3 = st.button(p_t["step3"][lang], use_container_width=True)
+    prog4 = st.button(p_t["step4"][lang], use_container_width=True)
+    prog5 = st.button(p_t["step5"][lang], use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # عرض خط إنتاج المحور الثاني
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+    prog6 = st.button(p_t["step6"][lang], use_container_width=True)
+    prog7 = st.button(p_t["step7"][lang], use_container_width=True)
+    prog8 = st.button(p_t["step8"][lang], use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # حاوية وبانر الاشتراك المالي المدفوع للشركة وحماية الأرباح
+    st.markdown(f"""
+    <div class="premium-banner">
+        <h3 style="color: white; margin-top: 0;">{p_t["premium_title"][lang]}</h3>
+        <p style="color: #93C5FD; font-size: 0.95rem;">{p_t["premium_desc"][lang]}</p>
+    </div>
+    """, unsafe_allow_html=True)
+    st.write("")
+    st.button(p_t["premium_btn"][lang], type="primary", use_container_width=True)
+
+with col_right_main:
+    st.markdown(f"### {p_t['right_title'][lang]}")
+    
+    # سطر تجريبي مؤقت بداخل العمود الأيمن سيتم ملؤه بالعدادات الستة فوراً في الجزء القادم
+    st.write("فضاء العدادات والمؤشرات الستة الملونة جاهز للاستقبال...")
