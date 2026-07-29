@@ -3,13 +3,22 @@ import plotly.graph_objects as go
 import pandas as pd
 from shared_utils.engines.engineering_compliance_engine import verify_soil_report
 from shared_utils.engines.energy_sustainability_engine import calculate_energy_roi
-# استدعاء محرك السحابة المركزية وتعمية البيانات الجديد
 from shared_utils.engines.data_anonymizer import anonymize_owner_data, get_provincial_green_stats
 
-# 1. إعدادات الصفحة وهوية المنصة البصرية القياسية
+# 1. إعدادات الصفحة وهوية المنصة البصرية
 st.set_page_config(page_title="Iraqi Green Construction Data Platform", page_icon="🏗️", layout="wide")
 
-# تطبيق كود التنسيق الهيكلي (CSS) المتوافق تماماً مع بايثون 3.14
+# تهيئة الذاكرة المؤقتة بشكل صريح ومضمون لمنع الـ AttributeError
+if "step2_completed" not in st.session_state:
+    st.session_state.step2_completed = False
+if "compliance_rate" not in st.session_state:
+    st.session_state.compliance_rate = 42
+if "chart_data" not in st.session_state:
+    st.session_state.chart_data = [20, 35, 40, 42, 42, 42]
+if "soil_results" not in st.session_state:
+    st.session_state.soil_results = None
+
+# تطبيق كود التنسيق الهيكلي (CSS) بطريقة آمنة
 theme_css = """
 <style>
     .stApp { background-color: #F8FAFC !important; }
@@ -30,7 +39,7 @@ theme_css = """
 """
 st.html(theme_css)
 
-# 2. القائمة الجانبية المحدثة لإضافة الخيار الثالث (Sidebar Navigation)
+# 2. القائمة الجانبية للتنقل بين المحاور (Sidebar Navigation)
 with st.sidebar:
     st.markdown("### 🗺️ بوابات المنصة")
     app_mode = st.radio(
@@ -60,10 +69,9 @@ with st.container():
         st.html("<span class='gray-text'>Project Manager</span>")
 
 st.markdown("---")
-# --- تابع لملف main_portal.py (الجزء الأول من الجزء الثاني لبوابات الامتثال والطاقة) ---
+# --- تابع لملف main_portal.py (القطعة الأولى من الجزء الثاني لغلق الأنظمة) ---
 
 if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صورتك":
-    # عرض لوحة التحكم الرئيسية المتقدمة والمطابقة لصورتك
     col_left, col_right = st.columns(2)
 
     with col_left:
@@ -77,30 +85,33 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
         """)
         
         with st.container():
-            if not st.session_state.step2_completed:
+            # قراءة البيانات والتحقق من حالة الذاكرة بشكل صريح وآمن
+            is_step2_done = st.session_state.get("step2_completed", False)
+            
+            if not is_step2_done:
                 st.html("<div class='step-active'><span style='color:#F97316; font-weight:bold;'>🟠 Step 2: Soil Inspection & Foundations</span> <span class='progress-badge'>In Progress</span></div>")
                 uploaded_file = st.file_uploader("Upload (Soil Lab PDF) - Max 50MB", type=["pdf"], key="soil_pdf")
                 if uploaded_file is not None:
                     result = verify_soil_report(uploaded_file)
                     st.session_state.soil_results = result
-                    if result["status"]:
+                    if result.get("status", False):
                         st.session_state.step2_completed = True
                         st.session_state.compliance_rate = 55
-                        st.session_state.chart_data = [42, 45, 48, 50, 42, 55]
+                        st.session_state.chart_data =
                         st.rerun()
             else:
                 st.html("<div class='step-done'><span style='color:#10B981; font-weight:bold;'>🟢 Step 2: Soil Inspection & Foundations</span> <span class='completed-badge'>Completed</span></div>")
-                if st.session_state.soil_results:
-                    res = st.session_state.soil_results
-                    st.info(f"📋 **بيانات المطابقة:** قدرة التحمل: {res['bearing_capacity']} kPa | معامل الأمان: {res['safety_factor']}")
+                soil_res = st.session_state.get("soil_results", None)
+                if soil_res:
+                    st.info(f"📋 **بيانات المطابقة:** قدرة التحمل: {soil_res.get('bearing_capacity')} kPa | معامل الأمان: {soil_res.get('safety_factor')}")
                 if st.button("🔄 Clear and Re-upload File"):
                     st.session_state.step2_completed = False
                     st.session_state.compliance_rate = 42
-                    st.session_state.chart_data = [42, 45, 48, 50, 42, 42]
+                    st.session_state.chart_data =
                     st.session_state.soil_results = None
                     st.rerun()
 
-        if st.session_state.step2_completed:
+        if st.session_state.get("step2_completed", False):
             st.html("<div class='step-active'><span style='color:#F97316; font-weight:bold;'>🟠 Step 3: Structural Audit & Load Calculations</span><span class='progress-badge'>Unlocked</span></div>")
         else:
             st.html("<div class='step-box' style='opacity:0.5;'><span style='color:#64748B;'>🔒 Step 3: Structural Audit & Load Calculations</span></div>")
@@ -119,15 +130,17 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
         with r1_c1:
             with st.container(border=True):
                 st.html("<div class='card-title'>🔵 1. Engineering Compliance</div>")
-                st.html(f"<div class='card-value'>{st.session_state.compliance_rate}%</div>")
-                fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=st.session_state.chart_data, mode='lines+markers', line=dict(color='#2563EB', width=2)))
+                current_rate = st.session_state.get("compliance_rate", 42)
+                st.html(f"<div class='card-value'>{current_rate}%</div>")
+                current_chart = st.session_state.get("chart_data", )
+                fig_line = go.Figure(go.Scatter(x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], y=current_chart, mode='lines+markers', line=dict(color='#2563EB', width=2)))
                 fig_line.update_layout(margin=dict(l=5,r=5,t=5,b=5), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_line, use_container_width=True, key="compliance_chart", config={'displayModeBar': False})
         with r1_c2:
             with st.container(border=True):
                 st.html("<div class='card-title'>🟢 2. Structural Integrity</div>")
                 st.html("<div class='card-value'>0%</div>")
-                fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=[0, 0, 0, 0], marker_color='#10B981'))
+                fig_bar = go.Figure(go.Bar(x=['Mar', 'Apr', 'May', 'Jun'], y=, marker_color='#10B981'))
                 fig_bar.update_layout(margin=dict(l=5,r=5,t=5,b=5), height=80, xaxis_visible=False, yaxis_visible=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_bar, use_container_width=True, key="structural_chart", config={'displayModeBar': False})
 
@@ -153,7 +166,7 @@ if app_mode == "📊 لوحة القيادة والمؤشرات تماثل صو�
                 st.html("<div class='card-value'>14%</div>")
                 st.progress(0.14)
 
-elif app_mode == "⚡ حاسبة عزل الطاقه والجدوى للمولدات":
+elif app_mode == "⚡ حاسبة عزل الطاقة والجدوى للمولدات":
     st.markdown("### ⚡ بوابة إدارة الطاقة المستدامة وحساب فواتير المولدات الأهلية صيفاً")
     st.info("هذه الحاسبة متوافقة مع الكود الإنشائي العراقي وتعتمد على درجات الحرارة القصوى لمدينة بغداد.")
     
@@ -171,21 +184,21 @@ elif app_mode == "⚡ حاسبة عزل الطاقه والجدوى للمولد
             results = calculate_energy_roi(area, insulation, amps)
             with st.container(border=True):
                 st.markdown("#### 📊 التقرير الهندسي والمالي للاستدامة")
-                st.write(f"☀️ درجة الحرارة التصميمية صيفاً لوسط العراق: **{results['design_temp']}°C**")
-                st.write(f"📉 معامل الكسب الحراري الكلي للجدران `U-Value`: **{results['u_value']} W/m²K**")
+                st.write(f"☀️ درجة الحرارة التصميمية صيفاً لوسط العراق: **{results.get('design_temp')}°C**")
+                st.write(f"📉 معامل الكسب الحراري الكلي للجدران `U-Value`: **{results.get('u_value')} W/m²K**")
                 st.html(f"""
                 <div class="roi-box">
                     <h5 style="color:#065F46; margin:0;">📉 الوفر في استهلاك الكهرباء والأمبيرات:</h5>
-                    <p style="font-size:20px; font-weight:bold; color:#047857; margin:5px 0;">تم توفير {results['amperage_saved']} أمبير! (الحاجة الجديدة: {results['new_amp_needed']} أمبير)</p>
+                    <p style="font-size:20px; font-weight:bold; color:#047857; margin:5px 0;">تم توفير {results.get('amperage_saved')} أمبير! (الحاجة الجديدة: {results.get('new_amp_needed']} أمبير)</p>
                     <h5 style="color:#065F46; margin:10px 0 0 0;">💰 الوفر المالي السنوي التقديري (تعرفة المولد الأهلية):</h5>
-                    <p style="font-size:22px; font-weight:bold; color:#15803D; margin:5px 0;">{results['annual_savings_iqd']:,} دينار عراقي سنوياً</p>
+                    <p style="font-size:22px; font-weight:bold; color:#15803D; margin:5px 0;">{results.get('annual_savings_iqd'):,} دينار عراقي سنوياً</p>
                     <h5 style="color:#1E3A8A; margin:10px 0 0 0;">⏳ فترة استرداد رأس مال تركيب العزل (Payback Period):</h5>
-                    <p style="font-size:18px; font-weight:bold; color:#1D4ED8; margin:5px 0;">{results['payback_years']} سنة برأس مال مسترد بالكامل</p>
+                    <p style="font-size:18px; font-weight:bold; color:#1D4ED8; margin:5px 0;">{results.get('payback_years')} سنة برأس مال مسترد بالكامل</p>
                 </div>
                 """)
         else:
             st.markdown("#### ⏳ بانتظار المدخلات")
-# --- تابع لملف main_portal.py (الجزء الثاني والأخير لعرض بوابة السحابة والفوتر) ---
+# --- تابع لملف main_portal.py (القطعة الثانية والأخيرة لعرض السحابة والفوتر الموحد) ---
 
 else:
     # عرض بوابة السحابة المركزية وتعمية الخصوصية (المحور الثالث)
@@ -193,11 +206,9 @@ else:
     st.info("تستعرض هذه الواجهة البيانات المجمّعة للمحافظات مع تفعيل خوارزمية تعمية الخصوصية لحماية معلومات المواطنين.")
     
     col_mask, col_stats = st.columns(2)
-    
     with col_mask:
         with st.container(border=True):
             st.markdown("#### 🔐 نظام حماية البيانات والخصوصية الفوري")
-            st.caption("ادخل نصاً يحتوي على معلومات حساسة (مثل هاتف عراقي أو رقم بطاقة موحدة) لاختبار خوارزمية الحجب:")
             raw_input = st.text_area(
                 "بيانات المالك التجريبية:", 
                 value="المالك: أحمد العبيدي، هاتف: 07701234567، الرقم الوطني الموحد: 199012345678، موقع المشروع: بغداد/المنصور"
@@ -213,11 +224,8 @@ else:
             st.markdown("#### 📈 البيانات المجمّعة للمحافظات العراقية (البناء الأخضر)")
             raw_stats = get_provincial_green_stats()
             df = pd.DataFrame(raw_stats)
-            
-            # عرض جدول البيانات الرسمي للمحافظات
             st.dataframe(df, use_container_width=True, hide_index=True)
             
-            # رسم بياني تفاعلي لترتيب المحافظات حسب الوفر الكربوني والتزامها بالعزل
             fig_prov = go.Figure(go.Bar(
                 x=df["المحافظة"], 
                 y=df["الوفر الكربوني التراكمي (طن)"], 
@@ -225,17 +233,12 @@ else:
                 text=df["نسبة الالتزام بالعزل (%)"].apply(lambda x: f"التزام {x}%"),
                 textposition='auto'
             ))
-            fig_prov.update_layout(
-                title="ترتيب المحافظات الأعلى وفراً للكربون والطاقة لعام 2026",
-                margin=dict(l=20, r=20, t=40, b=20), 
-                height=220,
-                plot_bgcolor='rgba(0,0,0,0)'
-            )
+            fig_prov.update_layout(title="ترتيب المحافظات الأعلى وفراً للكربون والطاقة لعام 2026", margin=dict(l=20, r=20, t=40, b=20), height=220, plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_prov, use_container_width=True, config={'displayModeBar': False})
 
 st.markdown("---")
 
-# 4. شريط التوثيقات الموحد للفوتر لإغلاق الصفحة بشكل أنيق
+# 4. شريط التوثيقات الموحد للفوتر لإغلاق الصفحة بشكل برمي مستقر
 f1, f2, f3, f4 = st.columns(4)
 with f1:
     st.markdown("🛡️ **Secure & Sovereign**")
