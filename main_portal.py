@@ -1,15 +1,15 @@
 import streamlit as st
 
-# 1. إعدادات المظهر البصري لشركة الاستدامة الخضراء
+# 1. إعدادات المظهر البصري وهوية شركة الاستدامة الخضراء
 st.set_page_config(page_title="منصة البناء المستدام - الاستدامة الخضراء", page_icon="🏢", layout="wide")
 
-# 2. كسر حظر السيرفر وحقن الخلفية كطبقة بصرية كاملة ممتدة تحت الأزرار
+# 2. حقن الخلفية كطبقة بصرية باستخدام رابط مستودعك الفعلي المصحح تماماً
 st.markdown("""
     <div style="
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: -1;
-        background: linear-gradient(rgba(10, 37, 64, 0.75), rgba(10, 37, 64, 0.75)), 
+        background: linear-gradient(rgba(248, 250, 252, 0.85), rgba(248, 250, 252, 0.85)), 
                     url('https://githubusercontent.com');
         background-size: cover;
         background-position: center;
@@ -17,7 +17,7 @@ st.markdown("""
     "></div>
     """, unsafe_allow_html=True)
 
-# 3. حقن تنسيقات الكتل والخطوط لتعوم فوق طبقة الخلفية بنقاء
+# 3. حقن تنسيقات الكتل والخطوط لتعوم فوق طبقة الخلفية بنقاء (ألوان داكنة للنصوص لضمان الوضوح)
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
@@ -123,9 +123,9 @@ t = {
 }
 lang = st.session_state.lang
 
-# 5. عرض نصوص العناوين الرئيسية بلون أبيض ناصع ليظهر فوق الخلفية الداكنة
-st.markdown(f'<h1 style="color: white; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
-st.markdown(f'<p style="color: #E2E8F0; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
+# 5. تثبيت الألوان النيلية الداكنة للعناوين لتبين بوضوح تام مهما كان لون الخلفية
+st.markdown(f'<h1 style="color: #0A2540; font-weight: 700;">{t["title"][lang]}</h1>', unsafe_allow_html=True)
+st.markdown(f'<p style="color: #334155; font-size: 1.2rem; margin-top: -10px;">{t["subtitle"][lang]}</p>', unsafe_allow_html=True)
 
 col_meta1, col_meta2, col_meta3 = st.columns(3)
 with col_meta1: st.info(t["project_loc"][lang])
