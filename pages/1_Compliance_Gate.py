@@ -1,7 +1,23 @@
 # pages/1_Compliance_Gate.py
 import streamlit as st
 
-# 1. إرساء وتأمين قيم الذاكرة الافتتاحية للمنصة في أول السطر لمنع الـ KeyError نهائياً
+# 1. إعداد الصفحة وقفل وإغلاق الشريط الجانبي الافتراضي تلقائياً فور الفتح
+st.set_page_config(
+    page_title="Iraqi Green Construction Data Platform", 
+    layout="wide",
+    initial_sidebar_state="collapsed"  # تجميد ومنع ظهور السايدبار الرمادي الافتراضي
+)
+
+# 2. حجب وحذف زر الأسهم (<<) وقائمة التنقل الافتراضية نهائياً من جذورها لتطابق صورتك
+st.markdown("""
+    <style>
+        [data-testid="stSidebarNav"] {display: none !important;}
+        [data-testid="collapsedControl"] {display: none !important;}
+        section[data-testid="stSidebar"] {display: none !important;}
+    </style>
+""", unsafe_allow_html=True)
+
+# 3. إرساء وتأمين قيم الذاكرة الافتتاحية للمنصة في الجلسة الحية لمنع الـ KeyError
 if "lang" not in st.session_state:
     st.session_state["lang"] = "AR"
 if "active_gate" not in st.session_state:
@@ -11,25 +27,23 @@ if "compliance_rate" not in st.session_state:
 if "step2_status" not in st.session_state:
     st.session_state["step2_status"] = "In Progress"
 
-# 2. استدعاء الترويسة والمكونات الهندسية من المجلد المخصص
+# 4. استدعاء الترويسة والمكونات الهندسية من مجلد الـ components
 from components.header import render_header
 from components.steps_view import render_steps_and_calculators
 from components.sidebar_metrics import render_sidebar_analytics
 
-# 3. رسم الترويسة العلوية للمنصة وجلب قاموس اللغة المباشر
+# 5. رسم الترويسة العلوية للمنصة وجلب قاموس اللغة المباشر
 L = render_header()
 lang = st.session_state["lang"]
 align = "right" if lang == "AR" else "left"
 
-# 4. فتح التوزيع الثلاثي المتوازن للشاشة طبق الأصل للتصميم السيادي المقر
-# العمود 1 (الجانب الأيسر للبوابات الست) | العمود 2 (الوسط للشاشات الفنية) | العمود 3 (الأيمن للتحليلات الحية والطقس)
+# 6. فتح التوزيع الثلاثي المتوازن للشاشة (اليمين للتحليلات، الوسط للشاشات الفنية، اليسار للبوابات الست)
 col_left_nav, col_center_stage, col_right_stats = st.columns([1.1, 1.6, 1.2], gap="large")
 
 # ==================== 1️⃣ الجانب الأيسر: قائمة التنقل الاستراتيجية للبوابات الست ====================
 with col_left_nav:
     st.markdown(f"<h5 style='color: #1F2937; text-align: {align};'>🛠️ {'بوابات التحكم والمنظومة' if lang == 'AR' else 'Control & Platform Gates'}</h5>", unsafe_allow_html=True)
     
-    # بناء الأزرار الرأسية الستة وربط تفاعلها الفوري بضغطة زر مفردة في الذاكرة الحية
     if st.button(L['gate_1_title'], use_container_width=True, type="primary" if st.session_state["active_gate"] == "gate_1" else "secondary"):
         st.session_state["active_gate"] = "gate_1"
         st.rerun()
@@ -54,13 +68,11 @@ with col_left_nav:
         st.session_state["active_gate"] = "gate_6"
         st.rerun()
 
-
-# ==================== 2️⃣ القطاع الأوسط الحركي: عرض شاشة البوابة المحددة بنظام التبديل الفوري ====================
+# ==================== 2️⃣ القطاع الأوسط الحركي: عرض شاشة البوابة المحددة ====================
 with col_center_stage:
     current_gate = st.session_state["active_gate"]
     
     if current_gate == "gate_1":
-        # الشاشة الكبرى للمطابقة والفلترة الـ 12 وشجرة الخطوات الخمس القائمة على داتا الإكسل
         render_steps_and_calculators(L, lang)
         
     elif current_gate == "gate_2":
@@ -78,7 +90,6 @@ with col_center_stage:
     elif current_gate == "gate_6":
         st.markdown(f"<div style='text-align: {align};'><h3>{L['gate_6_title']}</h3><p>📷 <b>منظومة التفتيش الرقمي الميداني:</b> قطاع استقبال صور وفيديوهات الكشف البلدي الموقعي لمطابقة تقدم التنفيذ الفعلي...</p></div>", unsafe_allow_html=True)
 
-
-# ==================== 3️⃣ الجانب الأيمن: لوحة التحليلات والمؤشرات المركزية والطقس العراقي الحي ====================
+# ==================== 3️⃣ الجانب الأيمن: لوحة التحليلات والمؤشرات المركزية والطقس الحي ====================
 with col_right_stats:
     render_sidebar_analytics(L, lang)
