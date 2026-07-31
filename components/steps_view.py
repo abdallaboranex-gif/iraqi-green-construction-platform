@@ -2,16 +2,13 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """رسم وإدارة شجرة الخطوات وبوابة الفلترة البلدية والموقعية المتقدمة لمدونة التربة"""
+    """رسم وإدارة شجرة الخطوات المفلترة هندسياً طبق الأصل من الصورة المرجعية"""
     
-    # 1. تحديد الاتجاه البصري والمحاذاة الفورية حسب لغة النظام لضمان عدم الخربطة البصرية
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
-    # حقن الـ CSS الموضعي لتنعيم وتنسيق الصناديق وحقول الإدخال لتطابق الصورة المرجعية
     st.markdown("""
         <style>
-            /* جعل حاويات التقرير تشبه الكروت المستقلة بخلفية بيضاء وظلال متناسقة */
             .compliance-card {
                 background-color: white !important;
                 padding: 16px !important;
@@ -21,86 +18,44 @@ def render_steps_and_calculators(L, lang):
                 margin-bottom: 12px !important;
             }
             .step-number {
-                background-color: #E8F5E9;
-                color: #2E7D32;
-                border-radius: 50%;
-                width: 28px;
-                height: 28px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                font-family: sans-serif;
+                background-color: #E8F5E9; color: #2E7D32; border-radius: 50%;
+                width: 28px; height: 28px; display: flex; align-items: center;
+                justify-content: center; font-weight: bold; font-family: sans-serif;
+            }
+            .step-number-pending {
+                background-color: #FFF3E0; color: #E65100; border-radius: 50%;
+                width: 28px; height: 28px; display: flex; align-items: center;
+                justify-content: center; font-weight: bold; font-family: sans-serif;
             }
         </style>
     """, unsafe_allow_html=True)
     
+    # --- 🏢 الخطوة 1 المحدثة: تحليل الموقع والمحددات البلدية الـ 12 الكبرى للعقار ---
     st.markdown(f"""
-    <div dir="{direction}" style="margin-bottom: 15px; text-align: {align};">
-        <span style="background-color: #DBEAFE; color: #1E40AF; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; vertical-align: middle;">{L['phase']}</span> 
-        <span style="font-weight: bold; font-size: 1.05rem; margin-left: 6px; margin-right: 6px; color: #1F2937;">{L['eng_comp']}</span> 
-        <span style="font-size: 0.82rem; color: #6B7280;">{L['seq_order']}</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # --- Step 1: تحليل الموقع والمحددات البلدية والأرضية (مكتملة ومترجمة) ---
-    with st.container(border=True):
-        c1, c2, c3 = st.columns([0.15, 1.0, 0.55])
-        with c1:
-            st.markdown("<div class='step-number'>1</div>", unsafe_allow_html=True)
-        with c2:
-            st.markdown(f"<div style='font-weight: bold; font-size: 0.92rem; color: #1F2937; text-align: {align};'>{L['step1_title']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='font-size: 0.72rem; color: #9CA3AF; text-align: {align};'>{L['step1_desc']}</div>", unsafe_allow_html=True)
-        with c3:
-            st.markdown(f"<div style='text-align: {align}; color: #10B981; font-weight: bold; font-size: 0.82rem; margin-bottom: 3px;'>{L['completed']}</div>", unsafe_allow_html=True)
-            st.button(L['dl_btn'], key="dl_s1", use_container_width=True)
-
-    st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
-
-    # --- Step 2: تفعيل بداية ترويسة الخطوة الثانية النشطة لتدقيق التربة ---
-    is_pending = st.session_state["step2_status"] == "In Progress"
-    border_clr = "#F59E0B" if is_pending else "#10B981"
-    badge_text = L['in_progress'] if is_pending else L['completed']
-    badge_clr = "#F59E0B" if is_pending else "#10B981"
-    
-    st.markdown(f"""
-    <div dir="{direction}" style="border: 1px solid #E5E7EB; padding: 14px; border-radius: 14px; background-color: white; margin-bottom: 8px; text-align: {align}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-right: 4px solid {border_clr if lang == 'EN' else 'transparent'}; border-left: 4px solid {border_clr if lang == 'AR' else 'transparent'}; padding-right: 8px; padding-left: 8px;">
+    <div dir="{direction}" style="border: 1px solid #10B981; padding: 15px; border-radius: 14px; background-color: white; margin-bottom: 12px; text-align: {align}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-right: 4px solid #10B981 if lang=='EN' else 'transparent'; border-left: 4px solid #10B981 if lang=='AR' else 'transparent'; padding-right: 8px; padding-left: 8px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="background-color: #FFF3E0; color: #E65100; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: sans-serif;">2</div>
+                <div class='step-number'>1</div>
                 <div>
-                    <div style="font-weight: bold; font-size: 0.92rem; color: #1F2937;">{L['step2_title']}</div>
-                    <div style="font-size: 0.72rem; color: #6B7280;">{L['step2_desc']}</div>
+                    <div style="font-weight: bold; font-size: 0.92rem; color: #1F2937;">{L['step1_title']}</div>
+                    <div style="font-size: 0.72rem; color: #6B7280;">{L['step1_desc']}</div>
                 </div>
             </div>
-            <div style="color: {badge_clr}; font-weight: bold; font-size: 0.82rem;">{badge_text}</div>
+            <div style="color: #10B981; font-weight: bold; font-size: 0.82rem;">{L['completed']}</div>
         </div>
     """, unsafe_allow_html=True)
     
-    st.markdown(f'<div dir="{direction}" style="text-align: {align};">', unsafe_allow_html=True)
-    # ==================== 📍 أولاً: بوابة المحددات البلدية والموقع الافتتاحية ====================
-    stage_title = '📍 المرحلة (أ): بوابة المحددات البلدية والموقع الافتتاحية' if lang == 'AR' else 'Stage (A): Municipal & Location Zoning Gate'
-    st.markdown(f"<h6 style='color: #1E3A8A; font-weight:bold; margin-bottom:10px;'>{stage_title}</h6>", unsafe_allow_html=True)
+    st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
     
     col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate / Project Scope:"
         gov_opts = {
-            "اختر المحافظة...": "",
-            "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
-            "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra", 
-            "المثنى": "Muthanna", "بابل": "Babil", "كربلاء المقدسة": "Karbala", 
-            "ديالى": "Diyala", "كركوك": "Kirkuk", "ميسان": "Maysan", 
-            "ذي قار": "Dhi_Qar", "القادسية": "Al_Qadisiyah", "واسِط": "Wasit", 
+            "اختر المحافظة...": "", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
+            "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra", "المثنى": "Muthanna", 
+            "بابل": "Babil", "كربلاء المقدسة": "Karbala", "ديالى": "Diyala", "كركوك": "Kirkuk", 
+            "ميسان": "Maysan", "ذي قار": "Dhi_Qar", "القادسية": "Al_Qadisiyah", "واسِط": "Wasit", 
             "أربيل": "Erbil", "السليمانية": "Sulaymaniyah", "دهوك": "Duhok"
-        } if lang == "AR" else {
-            "Select Governorate...": "",
-            "Baghdad": "Baghdad", "Salah Al-Din": "Salah_Al_Din", "Anbar": "Anbar", 
-            "Najaf": "Najaf", "Nineveh": "Nineveh", "Basra": "Basra", 
-            "Muthanna": "Muthanna", "Babil": "Babil", "Karbala": "Karbala", 
-            "Diyala": "Diyala", "Kirkuk": "Kirkuk", "Maysan": "Maysan", 
-            "Dhi Qar": "Dhi_Qar", "Al-Qadisiyah": "Al_Qadisiyah", "Wasit": "Wasit", 
-            "Erbil": "Erbil", "Sulaymaniyah": "Sulaymaniyah", "Duhok": "Duhok"
         }
         selected_gov_txt = st.selectbox(gov_lbl, list(gov_opts.keys()))
         selected_gov = gov_opts[selected_gov_txt]
@@ -110,7 +65,7 @@ def render_steps_and_calculators(L, lang):
         selected_req = st.selectbox(req_type_lbl, req_opts)
 
         lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
-        st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5" if lang == "AR" else "e.g., 1024/5", key="lot_num")
+        lot_num_val = st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5", key="lot_num")
 
     with col_f2:
         usage_lbl = "نوع استعمال العقار الأساسي:" if lang == "AR" else "Primary Land Usage:"
@@ -121,7 +76,7 @@ def render_steps_and_calculators(L, lang):
         land_width = st.number_input(width_lbl, min_value=0.0, max_value=500.0, value=0.0, step=0.5)
 
         sector_num_lbl = "رقم المقاطعة والبلدية للعقار:" if lang == "AR" else "District / Sector Number:"
-        st.text_input(sector_num_lbl, value="", placeholder="مثال: 42 مكة" if lang == "AR" else "e.g., 42 Mecca", key="sector_num")
+        sector_num_val = st.text_input(sector_num_lbl, value="", placeholder="مثال: 42 مكة", key="sector_num")
 
     with col_f3:
         street_lbl = "عرض الشارع المقابل للعقار (m):" if lang == "AR" else "Opposite Street Width (m):"
@@ -158,24 +113,43 @@ def render_steps_and_calculators(L, lang):
             is_heavy_structure = False
             
         st.markdown(f"""
-        <div style="background-color: #F8FAFC; padding: 12px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 10px; margin-bottom: 12px;">
-            <span style="font-size: 0.8rem; color: #4B5563;">{'🧠 استنتاج عقل النظام التلقائي لثقل ومساحة العقار:' if lang == 'AR' else '🧠 System Automatic Structural Load & Area Inference:'}</span><br>
-            <b style="color: {structural_class_clr}; font-size: 0.95rem;">{structural_class_txt} | {'المساحة المستنتجة:' if lang == 'AR' else 'Calculated Area:'} {user_area:.1f} m²</b>
+        <div style="background-color: #F8FAFC; padding: 10px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 5px;">
+            <b style="color: {structural_class_clr}; font-size: 0.85rem;">{structural_class_txt} | {'المساحة الكلية المستنتجة:' if lang == 'AR' else 'Calculated Area:'} {user_area:.1f} m²</b>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    # ==================== 🔬 ثانياً: الفحوصات الجيوتقنية المطلوبة والمعطيات ====================
-    stage_b_title = '🔬 المرحلة (ب): الفحوصات المطلوبة ونتائج تقرير المختبر' if lang == 'AR' else 'Stage (B): Required Tests & Laboratory Results'
-    st.markdown(f"<h6 style='color: #3B82F6; font-weight:bold; margin-bottom:10px;'>{stage_b_title}</h6>", unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
+
+    # --- 🔬 الخطوة 2: فحص التربة والأسس الجيوتقنية (النشطة والمفتوحة للفحص الفني) ---
+    is_pending = st.session_state["step2_status"] == "In Progress"
+    border_clr = "#F59E0B" if is_pending else "#10B981"
+    badge_text = L['in_progress'] if is_pending else L['completed']
+    badge_clr = "#F59E0B" if is_pending else "#10B981"
     
-    # 🧠 طباعة قائمة الفحوصات المطلوبة استباقياً بناءً على فلترة المرحلة (أ) داخل كارت رمادي مستقل
+    st.markdown(f"""
+    <div dir="{direction}" style="border: 1px solid #E5E7EB; padding: 15px; border-radius: 14px; background-color: white; margin-bottom: 12px; text-align: {align}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-right: 4px solid {border_clr if lang == 'EN' else 'transparent'}; border-left: 4px solid {border_clr if lang == 'AR' else 'transparent'}; padding-right: 8px; padding-left: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class='step-number-pending'>2</div>
+                <div>
+                    <div style="font-weight: bold; font-size: 0.92rem; color: #1F2937;">{L['step2_title']}</div>
+                    <div style="font-size: 0.72rem; color: #6B7280;">{L['step2_desc']}</div>
+                </div>
+            </div>
+            <div style="color: {badge_clr}; font-weight: bold; font-size: 0.82rem;">{badge_text}</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
+    
+    # 🧠 طباعة قائمة الفحوصات المطلوبة استباقياً بناءً على ما أدخل في الخطوة (1)
     if building_floors > 0 and selected_gov != "":
-        st.markdown(f"<div class='compliance-card' style='background-color: #FAFAFA; border: 1px dashed #CBD5E1;'>", unsafe_allow_html=True)
+        st.markdown(f"<div class='compliance-card' style='background-color: #FAFAFA; border: 1px dashed #CBD5E1; padding:12px; margin-bottom:12px;'>", unsafe_allow_html=True)
         st.markdown(f"<b>📋 {'الفحوصات والاشتراطات الإلزامية المقرة لهذا المشروع كودياً:' if lang == 'AR' else 'Mandatory Code Requirements For This Project:'}</b>", unsafe_allow_html=True)
         
         if is_heavy_structure:
-            bh_text = "• مطلوب 3 حفر اختبارية (Boreholes) كحد أدنى بعمق لا يقل عن 15 متراً لتأمين حسابات السرداب والأحمال." if lang == "AR" else "• Min 3 Boreholes required with depth >= 15m for basement/heavy loads."
+            bh_text = "• مطلوب 3 حفر اختبارية (Boreholes) كحد أدنى بعمق لا يقل عن 15 متراً لتأمين حسابات السرداب والأحمال الثقيلة." if lang == "AR" else "• Min 3 Boreholes required with depth >= 15m for basement/heavy loads."
         else:
             if user_area <= 400:
                 bh_text = "• مطلوب حفرتان اختباريتان فقط (Boreholes) بعمق لا يقل عن 6 أمتار بموجب مساحة الأرض (الجدول 2-1)." if lang == "AR" else "• 2 Boreholes required with depth >= 6m based on land area."
@@ -184,11 +158,11 @@ def render_steps_and_calculators(L, lang):
         st.markdown(f"<div style='color:#1E40AF; font-size:0.82rem; margin-top:4px;'>{bh_text}</div>", unsafe_allow_html=True)
         
         if has_basement:
-            h2o_text = "• ⚠️ شرط حرج: يتوجب تدقيق منسوب المياه الجوفية الحركي الميداني وإجراء فحص التحليل الكيميائي لعدوانية المياه." if lang == "AR" else "• ⚠️ Critical: Groundwater level measurement & chemical aggressiveness tests are mandatory."
+            h2o_text = "• ⚠️ شرط حرج: يتوجب تدقيق منسوب المياه الجوفية الحركي الميداني وإجراء فحص التحليل الكيميائي لعدوانية المياه الجوفية." if lang == "AR" else "• ⚠️ Critical: Groundwater level measurement & chemical aggressiveness tests are mandatory."
             st.markdown(f"<div style='color:#DC2626; font-size:0.82rem; margin-top:2px;'>{h2o_text}</div>", unsafe_allow_html=True)
             
         if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
-            gyp_txt = f"• قيد جيوكيميائي: يقع الموقع ضمن نطاق التربة الجبسية، مطلوب فحص الجبس الكلي والانهيارية تحت النقع." if lang == "AR" else "• Gypseous Soil zone: Gypsum content & collapsible soil tests are mandatory."
+            gyp_txt = f"• قيد جيوكيميائي: يقع الموقع ضمن نطاق التربة الجبسية، مطلوب فحص الجبس الكلي والانهيارية تحت النقع المستمر." if lang == "AR" else "• Gypseous Soil zone: Gypsum content & collapsible soil tests are mandatory."
             st.markdown(f"<div style='color:#B45309; font-size:0.82rem; margin-top:2px;'>{gyp_txt}</div>", unsafe_allow_html=True)
             
         if selected_gov in ["Najaf", "Muthanna"]:
@@ -197,7 +171,7 @@ def render_steps_and_calculators(L, lang):
             
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # حقل رفع تقرير المختبر الجيوتقني
+    # حقل رفع تقرير المختبر الجيوتقني ومستندات الفحص
     uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
     
     sub_col1, sub_col2 = st.columns(2)
@@ -215,11 +189,10 @@ def render_steps_and_calculators(L, lang):
         auth_opts = [L['auth_yes'], L['auth_no']]
         report_status_sel = st.selectbox(L['input_auth'], auth_opts)
         report_status = "معتمد ومجاز ومصادق" if report_status_sel == L['auth_yes'] else "غير مصادق"
-        
-    # تشغيل الفحص والتحقق الرقمي السداسي المربوط بملف الإكسل
+    # زر تشغيل الفحص والتحقق الرقمي السداسي المربوط بملف الإكسل
     if st.button(L['run_audit'], type="primary", use_container_width=True):
         if not selected_gov or not selected_req or not selected_usage or land_width == 0 or land_length == 0 or selected_corner == "":
-            st.error("⚠️ يرجى ملء كافة محددات المرحلة (أ) الافتتاحية والموقع وتحديد الأبعاد وموضع قطعة الأرض أولاً.")
+            st.error("⚠️ يرجى ملء كافة محددات الخطوة 1 الافتتاحية والموقع وتحديد الأبعاد وموضع قطعة الأرض أولاً بالكامل.")
         else:
             try:
                 from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
@@ -230,8 +203,8 @@ def render_steps_and_calculators(L, lang):
                     "soil_bearing_capacity": bearing_cap, "soil_report_status": report_status, 
                     "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
                     "actual_borehole_depth_meters": actual_bh_depth,
-                    "lot_num": st.session_state.get("lot_num", ""),
-                    "sector_num": st.session_state.get("sector_num", ""),
+                    "lot_num": lot_num_val,
+                    "sector_num": sector_num_val,
                     "building_floors": building_floors
                 }
                 
