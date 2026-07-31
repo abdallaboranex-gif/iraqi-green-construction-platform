@@ -4,7 +4,7 @@ import streamlit as st
 def render_step1(L, lang, direction, align):
     """رسم وإدارة الخطوة الأولى: بوابة المحددات البلدية الـ 12 الكبرى للعقار"""
     
-    # تهيئة قيم الجلسة الحية للمحددات الـ 12 لمنع تصفير الحقول
+    # تهيئة وحفظ قيم الجلسة الحية للمحددات الـ 12 لمنع تصفير الحقول
     if "selected_gov" not in st.session_state: st.session_state["selected_gov"] = ""
     if "selected_req" not in st.session_state: st.session_state["selected_req"] = ""
     if "selected_usage" not in st.session_state: st.session_state["selected_usage"] = ""
@@ -14,12 +14,12 @@ def render_step1(L, lang, direction, align):
     if "land_length" not in st.session_state: st.session_state["land_length"] = 0.0
     if "building_floors" not in st.session_state: st.session_state["building_floors"] = 0
 
-    # 🧠 فحص الجاهزية الحية لغلق أو فتح الخطوات التالية
+    # 🧠 فحص الجاهزية الحية: تم التعديل إلى >= 0 لفتح قفل الخطوة الثانية فوراً
     is_step1_ready = (
         st.session_state["selected_gov"] != "" and st.session_state["selected_req"] != "" and 
         st.session_state["selected_usage"] != "" and st.session_state["selected_corner"] != "" and 
         st.session_state["has_basement_sel"] != "" and st.session_state["land_width"] > 0.0 and 
-        st.session_state["land_length"] > 0.0 and st.session_state["building_floors"] > 0
+        st.session_state["land_length"] > 0.0 and st.session_state["building_floors"] >= 0
     )
 
     step1_border = "#10B981" if is_step1_ready else "#F59E0B"
@@ -45,10 +45,7 @@ def render_step1(L, lang, direction, align):
     col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate:"
-        gov_opts = {
-            "اختر المحافظة...": "", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
-            "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra", "المثنى": "Muthanna"
-        }
+        gov_opts = {"اختر المحافظة...": "", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra", "المثنى": "Muthanna"}
         gov_list = list(gov_opts.keys())
         idx_gov = gov_list.index(list(gov_opts.keys())[list(gov_opts.values()).index(st.session_state["selected_gov"])]) if st.session_state["selected_gov"] in gov_opts.values() and st.session_state["selected_gov"] != "" else 0
         selected_gov_txt = st.selectbox(gov_lbl, gov_list, index=idx_gov)
@@ -86,10 +83,10 @@ def render_step1(L, lang, direction, align):
     user_area = st.session_state["land_width"] * st.session_state["land_length"]
     building_floors = st.session_state["building_floors"]
 
-    if building_floors > 0:
+    if building_floors >= 0 and user_area > 0:
         is_heavy = building_floors >= 4 or has_basement
         class_txt = "🏢 منشأ ثقيل / أحمال حرجة" if is_heavy else "🏡 منشأ خفيف / أحمال اعتيادية"
-        class_clr = "#DC2626" if is_heavy else "#10B981"
+        class_clr = "#DC2626" if is_heavy_structure else "#10B981"
         st.markdown(f"<div style='background-color:#F8FAFC; padding:8px; border-right:4px solid {class_clr}; font-size:0.85rem; font-weight:bold; color:{class_clr}; text-align:{align};'>{class_txt} | المساحة: {user_area:.1f} m²</div>", unsafe_allow_html=True)
 
     st.markdown("</div></div>", unsafe_allow_html=True)
