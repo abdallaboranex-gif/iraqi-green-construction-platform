@@ -2,13 +2,12 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """رسم وإدارة شجرة الخطوات وبوابة الفلترة البلدية الافتتاحية لمدونة التربة"""
+    """رسم وإدارة شجرة الخطوات وبوابة الفلترة البلدية والموقعية المحدثة لمدونة التربة"""
     
-    # 1. تحديد الاتجاه البصري والمحاذاة الفورية حسب لغة النظام
+    # 1. تحديد الاتجاه البصري والمحاذاة الفورية حسب لغة النظام لضمان عدم الخربطة
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
-    # تغليف المكون بـ HTML لتأمين التنسيق والاتجاه الصحيح في ستريملت عند التبديل
     st.markdown(f"""
     <div dir="{direction}" style="margin-bottom: 20px; text-align: {align};">
         <span style="background-color: #DBEAFE; color: #1E40AF; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; vertical-align: middle;">{L['phase']}</span> 
@@ -17,7 +16,7 @@ def render_steps_and_calculators(L, lang):
     </div>
     """, unsafe_allow_html=True)
     
-    # --- Step 1: تحليل الموقع والمحددات البلدية والأرضية (مكتملة ومترجمة) ---
+    # --- Step 1: تحليل الموقع والمحددات البلدية (مكتملة ومترجمة) ---
     with st.container(border=True):
         c1, c2, c3 = st.columns([0.15, 1.0, 0.55])
         with c1:
@@ -31,7 +30,7 @@ def render_steps_and_calculators(L, lang):
 
     st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -10px 0; font-size: 1.2rem;'>│</div>", unsafe_allow_html=True)
 
-    # --- Step 2: تفعيل بداية ترويسة الخطوة الثانية النشطة لتدقيق التربة ---
+    # --- Step 2: تفعيل بداية ترويسة الخطوة الثانية وبوابة المحددات الموقعية ---
     is_pending = st.session_state["step2_status"] == "In Progress"
     border_clr = "#F59E0B" if is_pending else "#10B981"
     badge_text = L['in_progress'] if is_pending else L['completed']
@@ -52,75 +51,89 @@ def render_steps_and_calculators(L, lang):
     """, unsafe_allow_html=True)
     
     st.markdown(f'<div dir="{direction}" style="text-align: {align};">', unsafe_allow_html=True)
-    # ==================== 📍 أولاً: بوابة الفلترة والمحددات البلدية لـ العقار ====================
+    # ==================== 📍 أولاً: بوابة المحددات البلدية والموقع الافتتاحية ====================
     stage_title = '📍 المرحلة (أ): بوابة المحددات البلدية والموقع الافتتاحية' if lang == 'AR' else 'Stage (A): Municipal & Location Zoning Gate'
     st.markdown(f"<h5 style='color: #1E3A8A;'>{stage_title}</h5>", unsafe_allow_html=True)
     
     col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate / Project Scope:"
+        # تضمين كافة محافظات العراق الـ 18 لإحصاء عدد المعاملات مستقبلاً
         gov_opts = {
-            "بغداد / وسط العراق": "Baghdad", "صلاح الدين / تربة جبسية حرجية": "Salah_Al_Din",
-            "الأنبار / تربة جبسية رسوبية": "Anbar", "النجف الأشرف / خطر تكهفات جيرية": "Najaf",
-            "نينوى / تكوينات صخرية كلسية": "Nineveh", "البصرة / تربة طينية رخوة عدوانية": "Basra",
-            "المثنى / بادية السماوة وتكهفات": "Muthanna"
+            "اختر المحافظة...": "",
+            "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
+            "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra", 
+            "المثنى": "Muthanna", "بابل": "Babil", "كربلاء المقدسة": "Karbala", 
+            "ديالى": "Diyala", "كركوك": "Kirkuk", "ميسان": "Maysan", 
+            "ذي قار": "Dhi_Qar", "القادسية": "Al_Qadisiyah", "واسِط": "Wasit", 
+            "أربيل": "Erbil", "السليمانية": "Sulaymaniyah", "دهوك": "Duhok"
         } if lang == "AR" else {
-            "Baghdad": "Baghdad", "Salah Al-Din": "Salah_Al_Din", "Anbar": "Anbar",
-            "Najaf": "Najaf", "Nineveh": "Nineveh", "Basra": "Basra", "Muthanna": "Muthanna"
+            "Select Governorate...": "",
+            "Baghdad": "Baghdad", "Salah Al-Din": "Salah_Al_Din", "Anbar": "Anbar", 
+            "Najaf": "Najaf", "Nineveh": "Nineveh", "Basra": "Basra", 
+            "Muthanna": "Muthanna", "Babil": "Babil", "Karbala": "Karbala", 
+            "Diyala": "Diyala", "Kirkuk": "Kirkuk", "Maysan": "Maysan", 
+            "Dhi Qar": "Dhi_Qar", "Al-Qadisiyah": "Al_Qadisiyah", "Wasit": "Wasit", 
+            "Erbil": "Erbil", "Sulaymaniyah": "Sulaymaniyah", "Duhok": "Duhok"
         }
         selected_gov_txt = st.selectbox(gov_lbl, list(gov_opts.keys()))
         selected_gov = gov_opts[selected_gov_txt]
         
         req_type_lbl = "نوع الطلب / المعاملة:" if lang == "AR" else "Request / Permit Type:"
-        req_opts = ["heavy_projects", "investment_projects", "all"] if lang == "EN" else ["مشاريع ثقيلة وأبراج عالية", "مشاريع استثمارية وتطوير عقاري", "بناء وترميم سكني عام"]
+        req_opts = ["", "بناء جديد", "إعادة بناء", "إضافة طابق", "ترميم", "مشاريع كبرى"] if lang == "AR" else ["", "New Construction", "Reconstruction", "Floor Addition", "Renovation", "Major Projects"]
         selected_req = st.selectbox(req_type_lbl, req_opts)
 
         lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
-        st.text_input(lot_num_lbl, value="1024/5", key="lot_num")
+        st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5" if lang == "AR" else "e.g., 1024/5", key="lot_num")
 
     with col_f2:
         usage_lbl = "نوع استعمال العقار الأساسي:" if lang == "AR" else "Primary Land Usage:"
-        usage_opts = ["light_commercial_residential", "heavy_commercial_public", "all"] if lang == "EN" else ["سكني وتجاري خفيف / مكاتب", "تجاري ثقيل ومستشفيات ومباني عامة", "جميع الاستعمالات العامة"]
+        usage_opts = ["", "سكني", "تجاري", "خدمي", "صناعي", "مجمعات"] if lang == "AR" else ["", "Residential", "Commercial", "Service", "Industrial", "Complexes"]
         selected_usage = st.selectbox(usage_lbl, usage_opts)
 
-        area_lbl = "مساحة الأرض الكلية بموجب السند (m²):" if lang == "AR" else "Total Land Area (m²):"
-        user_area = st.number_input(area_lbl, min_value=50, max_value=100000, value=250)
+        # فصل أبعاد الأرض هندسياً (الواجهة والنزال) لاستنتاج المساحة رياضياً بدقة
+        width_lbl = "عرض الأرض / الواجهة (متر):" if lang == "AR" else "Land Width / Frontage (meters):"
+        land_width = st.number_input(width_lbl, min_value=0.0, max_value=500.0, value=0.0, step=0.5)
 
         sector_num_lbl = "رقم المقاطعة والبلدية للعقار:" if lang == "AR" else "District / Sector Number:"
-        st.text_input(sector_num_lbl, value="42 مكة", key="sector_num")
+        st.text_input(sector_num_lbl, value="", placeholder="مثال: 42 مكة" if lang == "AR" else "e.g., 42 Mecca", key="sector_num")
 
     with col_f3:
-        dim_lbl = "أبعاد واجهة وعمق الأرض (متر):" if lang == "AR" else "Land Dimensions (Meters):"
-        st.text_input(dim_lbl, value="10 x 25", key="land_dim")
-
         street_lbl = "عرض الشارع المقابل للعقار (m):" if lang == "AR" else "Opposite Street Width (m):"
-        st.number_input(street_lbl, min_value=4, max_value=100, value=10)
+        street_width = st.number_input(street_lbl, min_value=0.0, max_value=100.0, value=0.0, step=0.5)
+
+        length_lbl = "طول الأرض / النزال (متر):" if lang == "AR" else "Land Length / Depth (meters):"
+        land_length = st.number_input(length_lbl, min_value=0.0, max_value=500.0, value=0.0, step=0.5)
 
         basement_lbl = "هل يتضمن المخطط طابق سرداب (Basement)؟" if lang == "AR" else "Does it include a Basement floor?"
-        basement_opts = ["لا - بدون سرداب", "نعم - يحتوي سرداب"] if lang == "AR" else ["No Basement", "Yes - Includes Basement"]
+        basement_opts = ["", "موجود", "غير موجود"] if lang == "AR" else ["", "Present", "Not Present"]
         has_basement_sel = st.selectbox(basement_lbl, basement_opts)
-        has_basement = True if "نعم" in has_basement_sel or "Yes" in has_basement_sel else False
+        has_basement = True if has_basement_sel in ["موجود", "Present"] else False
 
-    # حقل عدد الطوابق الحاسم والمحوري للاستنتاج الذكي في بايثون
+    # 📏 حساب المساحة الكلية تلقائياً من ضرب الطول في العرض
+    user_area = land_width * land_length
+
+    # حقل عدد الطوابق (مصفّر وقابل للطباعة والتعديل المباشر)
     floors_lbl = "عدد طوابق المبنى المقترحة فوق مستوى الأرض:" if lang == "AR" else "Proposed Floors Above Ground:"
-    building_floors = st.number_input(floors_lbl, min_value=1, max_value=60, value=2)
+    building_floors = st.number_input(floors_lbl, min_value=0, max_value=60, value=0)
 
-    # 🧠 استنتاج عقل بايثون الذكي لثقل وخطورة المنشأ تلقائياً في الخلفية
-    if building_floors >= 4 or has_basement:
-        structural_class_txt = "🏢 منشأ ثقيل / أحمال حرجة عالية" if lang == "AR" else "🏢 Heavy Structure / High Load Class"
-        structural_class_clr = "#DC2626"
-        is_heavy_structure = True
-    else:
-        structural_class_txt = "🏡 منشأ خفيف / أحمال اعتيادية منخفضة" if lang == "AR" else "🏡 Light Structure / Normal Load Class"
-        structural_class_clr = "#10B981"
-        is_heavy_structure = False
-
-    st.markdown(f"""
-    <div style="background-color: #F8FAFC; padding: 12px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 10px; margin-bottom: 20px;">
-        <span style="font-size: 0.85rem; color: #4B5563;">{'🧠 استنتاج عقل النظام التلقائي لثقل المنشأ:' if lang == 'AR' else '🧠 System Automatic Structural Load Inference:'}</span><br>
-        <b style="color: {structural_class_clr}; font-size: 1.05rem;">{structural_class_txt}</b>
-    </div>
-    """, unsafe_allow_html=True)
+    # 🧠 استنتاج عقل بايثون التلقائي لثقل وهيكل المنشأ والأحمال
+    if building_floors > 0:
+        if building_floors >= 4 or has_basement:
+            structural_class_txt = "🏢 منشأ ثقيل / أحمال حرجة عالية" if lang == "AR" else "🏢 Heavy Structure / High Load Class"
+            structural_class_clr = "#DC2626"
+            is_heavy_structure = True
+        else:
+            structural_class_txt = "🏡 منشأ خفيف / أحمال اعتيادية منخفضة" if lang == "AR" else "🏡 Light Structure / Normal Load Class"
+            structural_class_clr = "#10B981"
+            is_heavy_structure = False
+            
+        st.markdown(f"""
+        <div style="background-color: #F8FAFC; padding: 12px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 10px; margin-bottom: 5px;">
+            <span style="font-size: 0.85rem; color: #4B5563;">{'🧠 استنتاج عقل النظام التلقائي لثقل ومساحة العقار:' if lang == 'AR' else '🧠 System Automatic Structural Load & Area Inference:'}</span><br>
+            <b style="color: {structural_class_clr}; font-size: 1.05rem;">{structural_class_txt} | {'المساحة المستنتجة:' if lang == 'AR' else 'Calculated Area:'} {user_area:.1f} m²</b>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
     # ==================== 🔬 ثانياً: معطيات فحص التربة والمختبر الجيوتقني ====================
@@ -150,46 +163,50 @@ def render_steps_and_calculators(L, lang):
         
     # تشغيل الفحص والتحقق الرقمي السداسي المربوط بملف الإكسل
     if st.button(L['run_audit'], type="primary", use_container_width=True):
-        try:
-            from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
-            excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
-            
-            # حزم البيانات والمدخلات الـ 11 والنتائج الاستنتاجية لإرسالها للمحرك المشترك
-            payload = {
-                "governorate": selected_gov,
-                "total_land_area_m2": user_area,
-                "soil_bearing_capacity": bearing_cap,
-                "soil_report_status": report_status, 
-                "actual_gypsum_percentage": gypsum,
-                "is_heavy_structure": is_heavy_structure, # تمرير الاستنتاج التلقائي (ثقيل / خفيف)
-                "actual_borehole_depth_meters": actual_bh_depth
-            }
-            
-            soil_result = excel_engine.validate_soil_report(payload)
-            
-            st.markdown(L['soil_report_header'])
-            
-            if soil_result["status"] == "PASSED":
-                st.success(soil_result["summary"])
-                st.session_state["compliance_rate"] = 68
-                st.session_state["step2_status"] = "Completed"
-                st.rerun()
-            else:
-                st.error(soil_result["summary"])
+        # منع التشغيل إذا لم يتم اختيار الحقول الإجبارية لمنع الأخطاء الحسابية
+        if not selected_gov or not selected_req or not selected_usage or land_width == 0 or land_length == 0:
+            st.error("⚠️ يرجى ملء كافة محددات المرحلة (أ) الافتتاحية والموقع وتحديد الأبعاد أولاً.")
+        else:
+            try:
+                from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
+                excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
                 
-                # طباعة وتوزيع البنود إلى التقارير والرسائل السداسية الإلزامية بالعربي
-                for idx, failure in enumerate(soil_result["failures"], 1):
-                    st.markdown(f"### ⚠️ المخالفة رقم {idx}:")
-                    st.markdown(f"<div style='background-color:#FEF2F2; padding:8px; border-right:4px solid #DC2626; margin-bottom:5px; font-weight:bold;'>{failure['severity']}</div>", unsafe_allow_html=True)
-                    st.markdown(f"**{failure['title']}**")
-                    st.info(failure['citizen_exp'])
-                    st.warning(failure['engineer_exp'])
-                    st.success(failure['resolution'])
-                    st.markdown(f"<div style='color:#991B1B; background-color:#FEE2E2; padding:8px; border-radius:4px;'><b>🚨 الأثر والعقوبة البلدية:</b> {failure['legal_penalty']}</div>", unsafe_allow_html=True)
-                    st.divider()
+                # حزم البيانات والمدخلات الـ 11 والنتائج الاستنتاجية لإرسالها للمحرك المشترك
+                payload = {
+                    "governorate": selected_gov,
+                    "total_land_area_m2": user_area,
+                    "soil_bearing_capacity": bearing_cap,
+                    "soil_report_status": report_status, 
+                    "actual_gypsum_percentage": gypsum,
+                    "is_heavy_structure": is_heavy_structure, # تمرير الاستنتاج التلقائي (ثقيل / خفيف)
+                    "actual_borehole_depth_meters": actual_bh_depth
+                }
+                
+                soil_result = excel_engine.validate_soil_report(payload)
+                
+                st.markdown(L['soil_report_header'])
+                
+                if soil_result["status"] == "PASSED":
+                    st.success(soil_result["summary"])
+                    st.session_state["compliance_rate"] = 68
+                    st.session_state["step2_status"] = "Completed"
+                    st.rerun()
+                else:
+                    st.error(soil_result["summary"])
                     
-        except Exception as e:
-            st.error(f"حدث خطأ في معالجة البيانات: {str(e)}")
+                    # طباعة وتوزيع البنود إلى التقارير والرسائل السداسية الإلزامية بالعربي
+                    for idx, failure in enumerate(soil_result["failures"], 1):
+                        st.markdown(f"### ⚠️ المخالفة رقم {idx}:")
+                        st.markdown(f"<div style='background-color:#FEF2F2; padding:8px; border-right:4px solid #DC2626; margin-bottom:5px; font-weight:bold;'>{failure['severity']}</div>", unsafe_allow_html=True)
+                        st.markdown(f"**{failure['title']}**")
+                        st.info(failure['citizen_exp'])
+                        st.warning(failure['engineer_exp'])
+                        st.success(failure['resolution'])
+                        st.markdown(f"<div style='color:#991B1B; background-color:#FEE2E2; padding:8px; border-radius:4px;'><b>🚨 الأثر والعقوبة البلدية:</b> {failure['legal_penalty']}</div>", unsafe_allow_html=True)
+                        st.divider()
+                        
+            except Exception as e:
+                st.error(f"حدث خطأ في معالجة البيانات: {str(e)}")
             
     st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
