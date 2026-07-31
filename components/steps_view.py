@@ -2,11 +2,11 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """رسم وإدارة شجرة الخطوات المفلترة هندسياً طبق الأصل من الصورة المرجعية وبحالات حية"""
-    
+    """رسم شجرة الخطوات المفلترة هندسياً طبق الأصل وبأعلى دقة وثبات"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
+    # حقن الـ CSS الموضعي لتنعيم وتنسيق الكروت وحواف صناديق الفلترة
     st.markdown("""
         <style>
             .compliance-card {
@@ -26,11 +26,7 @@ def render_steps_and_calculators(L, lang):
             }
         </style>
     """, unsafe_allow_html=True)
-    
-    # تعريف الحقول في الذاكرة مسبقاً قبل قراءتها لحساب حالة جاهزية الخطوة 1
-    # سيتم ربط هذه المتغيرات بالمدخلات أدناه لمنع خطأ المقارنة الاستباقية
-    # تفعيل واجهة المحددات الـ 12 وحساب حالة تعبئة البيانات حياً
-    # استخدام سشن ستيت لتخزين القيم بشكل مستقر ومنع التصفير التلقائي عند التحديث
+    # تفعيل وإرساء قيم الذاكرة الحية للمحددات الـ 12 لمنع تصفير الحقول
     if "selected_gov" not in st.session_state: st.session_state["selected_gov"] = ""
     if "selected_req" not in st.session_state: st.session_state["selected_req"] = ""
     if "selected_usage" not in st.session_state: st.session_state["selected_usage"] = ""
@@ -40,7 +36,7 @@ def render_steps_and_calculators(L, lang):
     if "land_length" not in st.session_state: st.session_state["land_length"] = 0.0
     if "building_floors" not in st.session_state: st.session_state["building_floors"] = 0
 
-    # حساب الجاهزية الحية: إذا كانت الخيارات فارغة أو الأبعاد أصفار، فالخطوة غير مكتملة بعد
+    # حساب منطق الجاهزية الحية: هل أدخل المدقق كافة الحقول الأساسية؟
     is_step1_ready = (
         st.session_state["selected_gov"] != "" and 
         st.session_state["selected_req"] != "" and 
@@ -52,14 +48,17 @@ def render_steps_and_calculators(L, lang):
         st.session_state["building_floors"] > 0
     )
 
-    step1_border = "#10B981" if is_step1_ready else "#F59E0B"
-    step1_badge = L['completed'] if is_step1_ready else ("🟡 يرجى إدخال البيانات الموقعية" if lang == "AR" else "🟡 Please Input Zoning Data")
-    step1_badge_clr = "#10B981" if is_step1_ready else "#F59E0B"
-
-    # --- 🏢 الخطوة 1: تحليل الموقع والمحددات البلدية الـ 12 الكبرى للعقار ---
+    # تحديد ألوان وحالة الصندوق الأول بناءً على اكتمال تعبئة البيانات
+    if is_step1_ready:
+        step1_border, step1_badge, step1_badge_clr = "#10B981", L['completed'], "#10B981"
+    else:
+        step1_border = "#F59E0B"
+        step1_badge = "🟡 يرجى إدخال البيانات الموقعية" if lang == "AR" else "🟡 Please Input Zoning Data"
+        step1_badge_clr = "#F59E0B"
+    # --- 🏢 الخطوة 1: تحليل الموقع والمحددات البلدية الـ 12 للعقار ---
     st.markdown(f"""
     <div dir="{direction}" style="border: 1px solid {step1_border}; padding: 15px; border-radius: 14px; background-color: white; margin-bottom: 12px; text-align: {align}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-right: 4px solid {step1_border if lang=='EN' else 'transparent'}; border-left: 4px solid {step1_border if lang=='AR' else 'transparent'}; padding-right: 8px; padding-left: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 8px; padding-left: 8px;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class='step-number'>1</div>
                 <div>
@@ -84,7 +83,7 @@ def render_steps_and_calculators(L, lang):
             "أربيل": "Erbil", "السليمانية": "Sulaymaniyah", "دهوك": "Duhok"
         }
         gov_list = list(gov_opts.keys())
-        idx_gov = gov_list.index([k for k,v in gov_opts.items() if v == st.session_state["selected_gov"]][0]) if st.session_state["selected_gov"] in gov_opts.values() and st.session_state["selected_gov"] != "" else 0
+        idx_gov = gov_list.index([k for k,v in gov_opts.items() if v == st.session_state["selected_gov"]]) if st.session_state["selected_gov"] in gov_opts.values() and st.session_state["selected_gov"] != "" else 0
         selected_gov_txt = st.selectbox(gov_lbl, gov_list, index=idx_gov)
         st.session_state["selected_gov"] = gov_opts[selected_gov_txt]
         
@@ -95,7 +94,6 @@ def render_steps_and_calculators(L, lang):
 
         lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
         lot_num_val = st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5", key="lot_num")
-
     with col_f2:
         usage_lbl = "نوع استعمال العقار الأساسي:" if lang == "AR" else "Primary Land Usage:"
         usage_opts = ["", "سكني", "تجاري", "خدمي", "صناعي", "مجمعات"] if lang == "AR" else ["", "Residential", "Commercial", "Service", "Industrial", "Complexes"]
@@ -146,18 +144,18 @@ def render_steps_and_calculators(L, lang):
             structural_class_clr = "#10B981"
             is_heavy_structure = False
             
+        area_msg = f"المساحة الكلية المستنتجة: {user_area:.1f} m²"
         st.markdown(f"""
-        <div style="background-color: #F8FAFC; padding: 10px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 5px;">
-            <b style="color: {structural_class_clr}; font-size: 0.85rem;">{structural_class_txt} | {'المساحة الكلية المستنتجة:' if lang == 'AR' else 'Calculated Area:'} {user_area:.1f} m²</b>
+        <div style="background-color: #F8FAFC; padding: 10px; border-radius: 8px; border-right: 4px solid {structural_class_clr}; border-left: 4px solid {structural_class_clr if lang == 'AR' else 'transparent'}; margin-top: 5px; text-align: {align};">
+            <b style="color: {structural_class_clr}; font-size: 0.85rem;">{structural_class_txt} | {area_msg}</b>
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
 
-    # --- 🔬 الخطوة 2: فحص التربة والأسس الجيوتقنية (النشطة والمقيدة بحالة الخطوة 1) ---
+    # --- 🔬 الخطوة 2: فحص التربة والأسس الجيوتقنية المعملية (المقيدة بحالة الخطوة 1) ---
     if not is_step1_ready:
-        # إذا لم تكتمل البيانات الموقعية في الخطوة الأولى، تظهر الخطوة الثانية بحالة القفل الانتظاري لمنع الفوضى والإدخال الخاطئ
         st.markdown(f"""
         <div dir="{direction}" style="border: 1px dashed #CBD5E1; padding: 15px; border-radius: 14px; background-color: #FAFAFA; margin-bottom: 12px; text-align: {align};">
             <div style="display: flex; justify-content: space-between; align-items: center; padding-right: 8px; padding-left: 8px;">
@@ -173,7 +171,6 @@ def render_steps_and_calculators(L, lang):
         </div>
         """, unsafe_allow_html=True)
     else:
-        # بمجرد امتلاء الحقول الـ 12، ينفتح قفل الخطوة الثانية فوراً وتظهر الحقول المختبرية المخصصة
         is_pending = st.session_state["step2_status"] == "In Progress"
         border_clr = "#F59E0B" if is_pending else "#10B981"
         badge_text = L['in_progress'] if is_pending else L['completed']
@@ -221,89 +218,58 @@ def render_steps_and_calculators(L, lang):
             st.markdown(f"<div style='color:#701A75; font-size:0.82rem; margin-top:2px;'>{void_txt}</div>", unsafe_allow_html=True)
             
         st.markdown("</div>", unsafe_allow_html=True)
-        # حقل رفع الملف الجيوتقني وقراءة المعطيات
         uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
-        
-        sub_col1, sub_col2 = st.columns(2)
+        sub_col1, sub_col2, sub_col3 = st.columns(3)
         with sub_col1:
             bearing_cap = st.number_input(L['input_bearing'], min_value=10, max_value=500, value=120)
-            if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
-                gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=4.50)
-            else:
-                gypsum = 1.0
-                
+            gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=4.50) if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"] else 1.0
         with sub_col2:
-            actual_bh_depth_lbl = "أقصى عمق واصلة له الحفرة الاختبارية ميدانياً (متر):" if lang == "AR" else "Maximum Actual Borehole Depth Executed (meters):"
+            actual_bh_depth_lbl = "أقصى عمق للحفرة ميدانياً (متر):" if lang == "AR" else "Max Borehole Depth (m):"
             actual_bh_depth = st.number_input(actual_bh_depth_lbl, min_value=0.0, max_value=120.0, value=6.0, step=0.5)
-
-            auth_opts = [L['auth_yes'], L['auth_no']]
-            report_status_sel = st.selectbox(L['input_auth'], auth_opts)
+            report_status_sel = st.selectbox(L['input_auth'], [L['auth_yes'], L['auth_no']])
             report_status = "معتمد ومجاز ومصادق" if report_status_sel == L['auth_yes'] else "غير مصادق"
+        with sub_col3:
+            if has_basement:
+                water_table_lbl = "منسوب المياه الجوفية المقاس (متر):" if lang == "AR" else "Water Table (m):"
+                water_table = st.number_input(water_table_lbl, min_value=0.0, max_value=50.0, value=1.5, step=0.1)
+                water_chem_lbl = "فحص عدوانية المياه الجوفية:" if lang == "AR" else "Water Aggressiveness:"
+                w_opts = ["مطابق وضمن الحدود الآمنة", "عدواني جداً"] if lang == "AR" else ["Compliant", "Highly Aggressive"]
+                water_chem_status = st.selectbox(water_chem_lbl, w_opts)
+            else:
+                water_table, water_chem_status = 20.0, "مطابق وضمن الحدود الآمنة"
             
         if st.button(L['run_audit'], type="primary", use_container_width=True):
             try:
                 from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
                 excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
-                
                 payload = {
-                    "governorate": selected_gov, "total_land_area_m2": user_area,
-                    "soil_bearing_capacity": bearing_cap, "soil_report_status": report_status, 
-                    "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
-                    "actual_borehole_depth_meters": actual_bh_depth,
-                    "lot_num": lot_num_val,
-                    "sector_num": sector_num_val,
-                    "building_floors": building_floors
+                    "governorate": selected_gov, "total_land_area_m2": user_area, "soil_bearing_capacity": bearing_cap,
+                    "soil_report_status": report_status, "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
+                    "actual_borehole_depth_meters": actual_bh_depth, "lot_num": lot_num_val, "sector_num": sector_num_val,
+                    "building_floors": building_floors, "water_table_meters": water_table, "water_chemical_status": water_chem_status
                 }
-                
                 soil_result = excel_engine.validate_soil_report(payload)
                 st.markdown(L['soil_report_header'])
-                
                 if soil_result["status"] == "PASSED":
                     st.success(soil_result["summary"])
-                    st.session_state["compliance_rate"] = 68
-                    st.session_state["step2_status"] = "Completed"
-                    
-                    pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Success.pdf")
-                    with open(pdf_path, "rb") as f:
-                        st.download_button(label="📥 تحميل شهادة المطابقة الرسمية (PDF)", data=f, file_name="Soil_Compliance_Success.pdf", mime="application/pdf", use_container_width=True)
+                    st.session_state["compliance_rate"], st.session_state["step2_status"] = 68, "Completed"
+                    st.rerun()
                 else:
                     st.error(soil_result["summary"])
-                    
                     pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Failures.pdf")
                     with open(pdf_path, "rb") as f:
                         st.download_button(label="📥 تحميل تقرير المخالفات والرفض الرسمي (PDF)", data=f, file_name="Soil_Compliance_Failures.pdf", mime="application/pdf", use_container_width=True)
-                    
                     for idx, failure in enumerate(soil_result["failures"], 1):
-                        st.markdown(f"<div class='compliance-card'>", unsafe_allow_html=True)
-                        st.markdown(f"### ⚠️ المخالفة رقم {idx}:")
-                        st.markdown(f"<div style='background-color:#FEF2F2; padding:8px; border-right:4px solid #DC2626; margin-bottom:5px; font-weight:bold;'>{failure['severity']}</div>", unsafe_allow_html=True)
-                        st.markdown(f"**{failure['title']}**")
-                        st.info(failure['citizen_exp'])
-                        st.warning(failure['engineer_exp'])
-                        st.success(failure['resolution'])
-                        st.markdown(f"<div style='color:#991B1B; background-color:#FEE2E2; padding:8px; border-radius:4px;'><b>🚨 الأثر والعقوبة البلدية:</b> {failure['legal_penalty']}</div>", unsafe_allow_html=True)
-                        st.markdown("</div>", unsafe_allow_html=True)
-                        st.divider()
-                        
-            except Exception as e:
-                st.error(f"حدث خطأ في معالجة البيانات: {str(e)}")
+                        st.markdown(f"<div class='compliance-card'>### ⚠️ المخالفة {idx}: **{failure['title']}**<br><small>{failure['severity']}</small><br>💬 {failure['citizen_exp']}<br>🔧 {failure['engineer_exp']}<br>✅ {failure['resolution']}<br>🚨 {failure['legal_penalty']}</div>", unsafe_allow_html=True)
+            except Exception as e: st.error(f"حدث خطأ في المعالجة: {str(e)}")
         st.markdown("</div></div>", unsafe_allow_html=True)
-    st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
 
-    # --- الخطوات المغلقة المتسلسلة (Step 3, 4, 5) الانتظارية المقفلة بنظام الكروت الأنيقة ---
-    steps_data = [("3", L['step3_title']), ("4", L['step4_title']), ("5", L['step5_title'])]
-    for step_num, step_title in steps_data:
+    st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
+    for step_num, step_title in [("3", L['step3_title']), ("4", L['step4_title']), ("5", L['step5_title'])]:
         with st.container(border=True):
             c1, c2, c3 = st.columns([0.15, 1.0, 0.4])
             with c1: st.markdown("<div>🔒</div>", unsafe_allow_html=True)
             with c2: st.markdown(f"<div style='font-weight: bold; font-size: 0.92rem; color: #9CA3AF; text-align: {align};'>{step_title}</div>", unsafe_allow_html=True)
             with c3: st.markdown(f"<div style='text-align: right; color: #9CA3AF; font-weight: bold; font-size: 0.82rem;'>{L['locked']}</div>", unsafe_allow_html=True)
 
-    # بنر الباقة المهنية المدفوعة الموحدة بأسفل الشاشة الإنشائية الوسطى
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(f"""
-    <div dir="{direction}" style="background-color: #0F172A; color: white; padding: 18px; border-radius: 14px; text-align: {align}; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="font-weight: bold; font-size: 1rem; margin-bottom: 4px; color: #F59E0B;">{L['premium_title']}</div>
-        <div style="font-size: 0.78rem; color: #94A3B8;">{L['premium_desc']}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"<br><div dir='{direction}' style='background-color: #0F172A; color: white; padding: 18px; border-radius: 14px; text-align: {align}; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'><div style='font-weight: bold; font-size: 1rem; margin-bottom: 4px; color: #F59E0B;'>{L['premium_title']}</div><div style='font-size: 0.78rem; color: #94A3B8;'>{L['premium_desc']}</div></div>", unsafe_allow_html=True)
