@@ -2,9 +2,9 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """رسم وإدارة شجرة الخطوات وبوابة الفلترة البلدية والموقعية المحدثة لمدونة التربة"""
+    """رسم وإدارة شجرة الخطوات وبوابة الفلترة البلدية والموقعية الاعتمادية الكلية على ملف الإكسل"""
     
-    # 1. تحديد الاتجاه البصري والمحاذاة الفورية حسب لغة النظام لضمان عدم الخربطة
+    # 1. تحديد الاتجاه البصري والمحاذاة الفورية حسب لغة النظام لمنع أي خربطة بصرية
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
@@ -58,7 +58,7 @@ def render_steps_and_calculators(L, lang):
     col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate / Project Scope:"
-        # تضمين كافة محافظات العراق الـ 18 لإحصاء عدد المعاملات مستقبلاً
+        # تضمين كافة محافظات العراق الـ 18 لإحصاء عدد المعاملات والربط الديناميكي
         gov_opts = {
             "اختر المحافظة...": "",
             "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
@@ -105,17 +105,25 @@ def render_steps_and_calculators(L, lang):
         length_lbl = "طول الأرض / النزال (متر):" if lang == "AR" else "Land Length / Depth (meters):"
         land_length = st.number_input(length_lbl, min_value=0.0, max_value=500.0, value=0.0, step=0.5)
 
+        # خيار موضع قطعة الأرض (ركن / عادي) الحاسم لحساب الارتدادات كودياً في المدونات الأخرى
+        corner_lbl = "موضع قطعة الأرض وتصنيفها:" if lang == "AR" else "Plot Orientation Class:"
+        corner_opts = ["", "عادي / وسطي", "ركن / زاوية"] if lang == "AR" else ["", "Standard / Middle", "Corner Plot"]
+        selected_corner = st.selectbox(corner_lbl, corner_opts)
+
+    # حقول اختيار السرداب وعدد الطوابق مصفوفة بشكل متناسق أسفل الأعمدة
+    col_sub_f1, col_sub_f2 = st.columns(2)
+    with col_sub_f1:
         basement_lbl = "هل يتضمن المخطط طابق سرداب (Basement)؟" if lang == "AR" else "Does it include a Basement floor?"
         basement_opts = ["", "موجود", "غير موجود"] if lang == "AR" else ["", "Present", "Not Present"]
         has_basement_sel = st.selectbox(basement_lbl, basement_opts)
         has_basement = True if has_basement_sel in ["موجود", "Present"] else False
 
+    with col_sub_f2:
+        floors_lbl = "عدد طوابق المبنى المقترحة فوق مستوى الأرض:" if lang == "AR" else "Proposed Floors Above Ground:"
+        building_floors = st.number_input(floors_lbl, min_value=0, max_value=60, value=0)
+
     # 📏 حساب المساحة الكلية تلقائياً من ضرب الطول في العرض
     user_area = land_width * land_length
-
-    # حقل عدد الطوابق (مصفّر وقابل للطباعة والتعديل المباشر)
-    floors_lbl = "عدد طوابق المبنى المقترحة فوق مستوى الأرض:" if lang == "AR" else "Proposed Floors Above Ground:"
-    building_floors = st.number_input(floors_lbl, min_value=0, max_value=60, value=0)
 
     # 🧠 استنتاج عقل بايثون التلقائي لثقل وهيكل المنشأ والأحمال
     if building_floors > 0:
@@ -136,24 +144,55 @@ def render_steps_and_calculators(L, lang):
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    # ==================== 🔬 ثانياً: معطيات فحص التربة والمختبر الجيوتقني ====================
-    stage_b_title = '🔬 المرحلة (ب): نتائج الفحوصات المختبرية لتقرير التربة' if lang == 'AR' else 'Stage (B): Geotechnical Laboratory Test Results'
+    # ==================== 🔬 ثانياً: الفحوصات الجيوتقنية المطلوبة والمعطيات ====================
+    stage_b_title = '🔬 المرحلة (ب): الفحوصات المطلوبة ونتائج تقرير المختبر' if lang == 'AR' else 'Stage (B): Required Tests & Laboratory Results'
     st.markdown(f"<h5 style='color: #3B82F6;'>{stage_b_title}</h5>", unsafe_allow_html=True)
     
+    # 🧠 طباعة قائمة الفحوصات المطلوبة استباقياً بناءً على فلترة المرحلة (أ)
+    if building_floors > 0 and selected_gov != "":
+        st.markdown(f"<b>📋 {'الفحوصات والاشتراطات الإلزامية المقرة لهذا المشروع كودياً:' if lang == 'AR' else 'Mandatory Code Requirements For This Project:'}</b>", unsafe_allow_html=True)
+        
+        # أ. حساب حتمية الحفر والعمق ميكانيكياً
+        if is_heavy_structure:
+            bh_text = "• مطلوب 3 حفر اختبارية (Boreholes) كحد أدنى بعمق لا يقل عن 15 متراً لتأمين حسابات السرداب والأحمال." if lang == "AR" else "• Min 3 Boreholes required with depth >= 15m for basement/heavy loads."
+        else:
+            if user_area <= 400:
+                bh_text = "• مطلوب حفرتان اختباريتان فقط (Boreholes) بعمق لا يقل عن 6 أمتار بموجب مساحة الأرض (الجدول 2-1)." if lang == "AR" else "• 2 Boreholes required with depth >= 6m based on land area."
+            else:
+                bh_text = "• مطلوب 3 حفر اختبارية كحد أدنى بعمق لا يقل عن 6 أمتار لتجاوز مساحة الأرض 400 م²." if lang == "AR" else "• Min 3 Boreholes required with depth >= 6m due to area > 400m²."
+        st.markdown(f"<span style='color:#1E40AF; font-size:0.85rem;'>{bh_text}</span>", unsafe_allow_html=True)
+        
+        # ب. تفعيل فحص المياه الجوفية والقص للسرداب
+        if has_basement:
+            h2o_text = "• ⚠️ شرط حرج: يتوجب تدقيق منسوب المياه الجوفية الحركي الميداني وإجراء فحص التحليل الكيميائي لعدوانية المياه." if lang == "AR" else "• ⚠️ Critical: Groundwater level measurement & chemical aggressiveness tests are mandatory."
+            st.markdown(f"<span style='color:#DC2626; font-size:0.85rem;'>{h2o_text}</span>", unsafe_allow_html=True)
+            
+        # ج. فحص الجبس الجغرافي
+        if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
+            gyp_txt = f"• قيد جيوكيميائي: يقع الموقع ضمن نطاق التربة الجبسية، مطلوب فحص الجبس الكلي والانهيارية تحت النقع." if lang == "AR" else "• Gypseous Soil zone: Gypsum content & collapsible soil tests are mandatory."
+            st.markdown(f"<span style='color:#B45309; font-size:0.85rem;'>{gyp_txt}</span>", unsafe_allow_html=True)
+            
+        # د. فحص التكهفات في النجف والمثنى
+        if selected_gov in ["Najaf", "Muthanna"]:
+            void_txt = "• قيد جيولوجي خاص: مطلوب إرفاق فحص المسح الراداري الأرضي (GPR Void Scan) لضمان خلو الموقع من التكهفات الكلسية." if lang == "AR" else "• Geological Zone: GPR Void Scan is mandatory to rule out limestone cavities."
+            st.markdown(f"<span style='color:#701A75; font-size:0.85rem;'>{void_txt}</span>", unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    # حقل رفع ملف الـ PDF الجيوتقني
     uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
     
     sub_col1, sub_col2 = st.columns(2)
     with sub_col1:
         bearing_cap = st.number_input(L['input_bearing'], min_value=10, max_value=500, value=120)
         
-        # فلترة جغرافية ذكية: حقل الجبس يظهر فقط في المحافظات المصنفة بالتربة الجبسية لراحة المدقق
+        # تصفية ديناميكية: يظهر حقل الجبس فقط في المحافظات الجبسية المقرة بالإكسل لراحة الفاحص
         if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
             gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=4.50)
         else:
-            gypsum = 1.0 # قيمة افتراضية آمنة لبقية النطاقات
+            gypsum = 1.0
             
     with sub_col2:
-        # حقل عمق الحفر الفعلي لإقرانه تلقائياً بالاستنتاج الذكي (المنشأ الخفيف والثقيل)
         actual_bh_depth_lbl = "أقصى عمق واصلة له الحفرة الاختبارية ميدانياً (متر):" if lang == "AR" else "Maximum Actual Borehole Depth Executed (meters):"
         actual_bh_depth = st.number_input(actual_bh_depth_lbl, min_value=0.0, max_value=120.0, value=6.0, step=0.5)
 
@@ -163,27 +202,24 @@ def render_steps_and_calculators(L, lang):
         
     # تشغيل الفحص والتحقق الرقمي السداسي المربوط بملف الإكسل
     if st.button(L['run_audit'], type="primary", use_container_width=True):
-        # منع التشغيل إذا لم يتم اختيار الحقول الإجبارية لمنع الأخطاء الحسابية
-        if not selected_gov or not selected_req or not selected_usage or land_width == 0 or land_length == 0:
-            st.error("⚠️ يرجى ملء كافة محددات المرحلة (أ) الافتتاحية والموقع وتحديد الأبعاد أولاً.")
+        if not selected_gov or not selected_req or not selected_usage or land_width == 0 or land_length == 0 or selected_corner == "":
+            st.error("⚠️ يرجى ملء كافة محددات المرحلة (أ) الافتتاحية والموقع وتحديد الأبعاد وموضع قطعة الأرض أولاً.")
         else:
             try:
                 from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
                 excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
                 
-                # حزم البيانات والمدخلات الـ 11 والنتائج الاستنتاجية لإرسالها للمحرك المشترك
                 payload = {
                     "governorate": selected_gov,
                     "total_land_area_m2": user_area,
                     "soil_bearing_capacity": bearing_cap,
                     "soil_report_status": report_status, 
                     "actual_gypsum_percentage": gypsum,
-                    "is_heavy_structure": is_heavy_structure, # تمرير الاستنتاج التلقائي (ثقيل / خفيف)
+                    "is_heavy_structure": is_heavy_structure,
                     "actual_borehole_depth_meters": actual_bh_depth
                 }
                 
                 soil_result = excel_engine.validate_soil_report(payload)
-                
                 st.markdown(L['soil_report_header'])
                 
                 if soil_result["status"] == "PASSED":
@@ -194,7 +230,6 @@ def render_steps_and_calculators(L, lang):
                 else:
                     st.error(soil_result["summary"])
                     
-                    # طباعة وتوزيع البنود إلى التقارير والرسائل السداسية الإلزامية بالعربي
                     for idx, failure in enumerate(soil_result["failures"], 1):
                         st.markdown(f"### ⚠️ المخالفة رقم {idx}:")
                         st.markdown(f"<div style='background-color:#FEF2F2; padding:8px; border-right:4px solid #DC2626; margin-bottom:5px; font-weight:bold;'>{failure['severity']}</div>", unsafe_allow_html=True)
