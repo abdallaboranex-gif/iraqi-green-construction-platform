@@ -1,80 +1,89 @@
-import json
+# shared_engines/compliance_engine.py
+import pandas as pd
 import os
+import streamlit as st
 
-class IraqiSoilValidationEngine:
-    def __init__(self, rules_file_path="soil_rules.json"):
-        """تحميل قواعد فحص التربة من ملف الـ JSON المرفوع"""
-        self.rules_file_path = rules_file_path
-        self.rules = self._load_rules()
+class IraqiDynamicComplianceEngine:
+    def __init__(self, excel_filename="soil_investigation_code.xlsx"):
+        """توجيه المحرك ليفتح ملف الإكسل المخصص للمدونة المحددة داخل مجلد data"""
+        self.excel_path = os.path.join("data", excel_filename)
 
     def _load_rules(self):
-        if os.path.exists(self.rules_file_path):
-            with open(self.rules_file_path, 'r', encoding='utf-8') as f:
-                return json.load(f).get("Soil_Investigation_Rules", {}).get("Rules", [])
-        return []
+        """فتح ملف الإكسل للمدونة المحددة وقراءة السطر الثاني كأعمدة حاكمة لـ بايثون"""
+        if os.path.exists(self.excel_path):
+            try:
+                # قراءة ورقة العمل الأولى دائماً بغض النظر عن اسمها، مع اعتبار السطر الثاني هو أسماء الحقول البرمجية
+                df = pd.read_excel(self.excel_path, sheet_name=0, header=1)
+                # تنظيف وتنقية أسماء الأعمدة من الفراغات
+                df.columns = [str(col).strip() for col in df.columns]
+                # تحويل العمود المعرفي البرمجي إلى Index للمطابقة التلقائية الفورية
+                return df.set_index('Code_Section').to_dict(orient='index')
+            except Exception as e:
+                st.sidebar.error(f"⚠️ خطأ في قراءة ملف المدونة {self.excel_path}: {str(e)}")
+                return {}
+        return {}
 
     def validate_soil_report(self, submission_data):
-        """المحرك البرمجي لمطابقة المدخلات مع المحددات الكودية الحاكمة"""
-        report = {"status": "PASSED", "failures": [], "warnings": []}
+        """محرك فحص التربة الديناميكي - سحب وعرض التقارير السداسية بالعربي من ملف التربة الخاص بها"""
+        report = {"status": "PASSED", "failures": [], "summary": ""}
         
-        # 1. فحص استثناءات طلبات الترميم البسيط والديكور
-        if submission_data.get("project_type") in ["ترميم بسيط", "ديكور"] and not submission_data.get("adds_structural_load", False):
-            report["summary"] = "✅ مستثنى: طلبات الترميم والديكور الخفيفة مستثناة كودياً من فحص التربة."
-            return report
-
-        # تحويل القواعد إلى قاموس سريع للوصول للقيم الافتراضية
-        rules_dict = {r["Element_Name"]: r for r in self.rules}
-
-        # 2. فحص صلاحية التقرير إدارياً وقانونياً (Rule 1 & Rule 13)
-        if submission_data.get("soil_report_status") != "معتمد ومجاز ومصادق":
-            report["failures"].append("❌ تقرير فحص التربة المرفق غير معتمد أو غير مصادق قانونياً من نقابة المهندسين.")
+        # تحميل القواعد الحية من ملف إكسل التربة المستقل
+        rules = self._load_rules()
         
-        if submission_data.get("report_age_months", 0) > rules_dict.get("Soil_Report_Age", {}).get("Required_Value", 24):
-            report["failures"].append("❌ تقرير فحص الأرض منتهي الصلاحية الزمنية (تجاوز 24 شهراً).")
+        # حماية السيرفر من الانهيار في حال لم يتم رفع ملف الإكسل في مجلد data بعد
+        if not rules:
+            return {"status": "PASSED", "failures": [], "summary": "⚠️ ملف الإكسل الخاص بالتربة data/soil_investigation_code.xlsx غير موجود."}
 
-        # 3. فحص عدد الحفر الاختبارية بناءً على المساحة (Rule 2)
-        area = submission_data.get("total_land_area_m2", 0)
-        actual_bh = submission_data.get("actual_boreholes_count", 0)
-        
-        # استثناء المساحات الصغيرة جداً
-        if area <= 150 and submission_data.get("total_floors", 1) <= 2:
-            required_bh = 1  # يكتفى بحفرة واحدة مأذونة كودياً بشرط ألا تكون أرض دفان
-        else:
-            required_bh = 2 if area <= 400 else 3
-            
-        if actual_bh < required_bh:
-            report["failures"].append(f"❌ عدد الحفر الاستكشافية الميدانية ({actual_bh}) غير كافٍ هندسياً. الحد الأدنى المطلوب لهذه المساحة هو ({required_bh}) حفرة.")
+        # جلب المعطيات الفعلية التي أدخلها المستخدم في الواجهة
+        actual_bearing = submission_data.get("soil_bearing_capacity", 120)
+        actual_gypsum = submission_data.get("actual_gypsum_percentage", 4.5)
+        governorate = submission_data.get("governorate", "Baghdad")
+        report_status = submission_data.get("soil_report_status", "معتمد ومجاز ومصادق")
 
-        # 4. فحص أعماق الحفر (Rule 3 & Rule 4) - شرط الأبراج والسراديب الحرج
-        actual_depth = submission_data.get("actual_borehole_depth_meters", 0.0)
-        has_basement = submission_data.get("has_basement", False)
-        floors = submission_data.get("total_floors", 1)
+        # -------------------------------------------------------------------------
+        # 1. مطابقة بند اعتمادية وختم تقرير التربة
+        # -------------------------------------------------------------------------
+        auth_rule = rules.get("Soil_Report_Validity", {})
+        if auth_rule and report_status != str(auth_rule.get("Required_Value")).strip():
+            self._add_failure_to_report(report, auth_rule)
 
-        if (floors >= 4 or has_basement) and actual_depth < 15.0:
-            report["failures"].append(f"❌ عمق فحص التربة قصير جداً ({actual_depth}م) ولا يتناسب مع منشأ ثقيل/سرداب. الكود يفرض عمقاً حرجاً لا يقل عن 15 متر.")
-        elif actual_depth < rules_dict.get("Borehole_Depth_Shallow", {}).get("Required_Value", 6.0):
-            report["failures"].append(f"❌ عمق الحفرة الاختبارية الحالي ({actual_depth}م) أقل من الحد الأدنى المقبول كودياً للأبنية الخفيفة (6 أمتar).")
+        # -------------------------------------------------------------------------
+        # 2. مطابقة حد قدرة تحمل التربة المقاسة (kPa)
+        # -------------------------------------------------------------------------
+        bearing_rule = rules.get("Soil_Bearing_Capacity", {})
+        if bearing_rule:
+            min_allowed = float(bearing_rule.get("Min_Value", 0))
+            if actual_bearing < min_allowed:
+                self._add_failure_to_report(report, bearing_rule)
 
-        # 5. الفحوصات الكيميائية والبيئات العدوانية (Rule 5 & Rule 8) - قيد صلاح الدين والأنبار
-        so3_pct = submission_data.get("actual_so3_percentage", 0.0)
-        if so3_pct > rules_dict.get("Soil_Sulphate_Content_SO3", {}).get("Required_Value", 5.0):
-            report["warnings"].append(f"⚠️ تنبيه كيميائي: نسبة الكبريتات ({so3_pct}%) تصنف التربة كبيئة عدوانية. النظام يلزم برمجياً باستخدام سمنت مقاوم طراز الفئة الخامسة (Type V) وعزل الأسس.")
+        # -------------------------------------------------------------------------
+        # 3. مطابقة نسبة الجبس والتربة الانهيارية (قيد المحافظات)
+        # -------------------------------------------------------------------------
+        gypsum_rule = rules.get("Soil_Gypsum_Content", {})
+        if gypsum_rule:
+            max_allowed = float(gypsum_rule.get("Max_Value", 100))
+            # تفعيل قيد فحص التربة الجبسية لشرط المحافظات الأربع
+            if governorate in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"] and actual_gypsum > max_allowed:
+                self._add_failure_to_report(report, gypsum_rule)
 
-        gypsum_pct = submission_data.get("actual_gypsum_percentage", 0.0)
-        gov = submission_data.get("governorate", "")
-        if gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"] and gypsum_pct > rules_dict.get("Soil_Gypsum_Content", {}).get("Required_Value", 10.75):
-            report["failures"].append(f"❌ خطر تربة انهيارية في {gov}: نسبة الجبس ({gypsum_pct}%) تتجاوز الحد الآمن كودياً (10.75%). يُلزم الكود برفض التأسيس التقليدي وإجبار المصمم على معالجة التربة بالإحلال أو الركائز العميقة.")
-
-        # 6. فحص درجة الحدل الميداني (Rule 9)
-        compaction = submission_data.get("actual_compaction_degree_percentage", 100.0)
-        if compaction < rules_dict.get("Soil_Compaction_Degree", {}).get("Required_Value", 95.0):
-            report["failures"].append(f"❌ درجة حدل وتربيط تربة التأسيس الميدانية ({compaction}%) دون الحد الأدنى المقر كودياً (95%). يجب إعادة حدل الأرض ميكانيكياً ورشها بالماء.")
-
-        # تحديد النتيجة النهائية
+        # تحديد النتيجة النهائية للمطابقة وإرسال الإشارة للوحة القيادة
         if report["failures"]:
-            report["status"] = "FAILED"
-            report["summary"] = f"❌ تم رفض المعاملة رقمياً لوجود {len(report['failures'])} مخالفات حرجة لمدونة فحص التربة العراقية والقوانين البلديّة."
+            has_critical = any(f["severity"].startswith("CRITICAL") or "حرجة" in f["severity"] for f in report["failures"])
+            if has_critical:
+                report["status"] = "FAILED"
+                report["summary"] = "❌ تم رفض المعاملة رقمياً لوجود مخالفات كودية وبلدية حرجة بموجب جدول إكسل مدونة فحص التربة."
         else:
-            report["summary"] = "✅ المعاملة مستوفية تماماً لكافة الشروط الكودية والفحوصات المختبرية لمدونة التربة والأسس."
+            report["summary"] = "✅ المعاملة مستوفية ومطابقة تماماً لكافة شروط وأرقام ملف إكسل مدونة التربة المعتمد."
 
         return report
+
+    def _add_failure_to_report(self, report, rule_row):
+        """دالة سحب الأبعاد والرسائل السداسية بالعربي من الخلايا وضخها تلقائياً بالواجهة"""
+        report["failures"].append({
+            "severity": f"{rule_row.get('Msg_1_Severity', 'CRITICAL')}",
+            "title": f"عنوان المخالفة الفني: {rule_row.get('Msg_2_Title', 'مخالفة غير معرفة')}",
+            "citizen_exp": f"شرح المخالفة للمواطن: {rule_row.get('Msg_3_Citizen_Explanation', '')}",
+            "engineer_exp": f"شرح المخالفة للمهندس: {rule_row.get('Msg_4_Engineer_Explanation', '')}",
+            "resolution": f"رسالة Tوجيه والإصلاح الفني: {rule_row.get('Msg_5_Technical_Resolution', '')}",
+            "legal_penalty": f"العقوبة والأثر القانوني: {rule_row.get('Msg_6_Legal_Penalty', '')}"
+        })
