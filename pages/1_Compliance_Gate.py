@@ -27,8 +27,8 @@ with st.container(border=True):
     if st.button("🔐 تشغيل التدقيق الكودي والبلدي الفوري", type="primary"):
         # استدعاء محرك الفحص المطور والمستدام
         res = verify_comprehensive_compliance(zone, soil_key, bearing_cap, building_height)
-        if res["status"]:
-                   st.success(f"🎉 {res['message']}")
+          if res["status"]:
+        st.success(f"🎉 {res['message']}")
         
         # 1. استدعاء محرك فحص التربة الجديد
         from shared_engines.compliance_engine import IraqiSoilValidationEngine
@@ -65,9 +65,8 @@ with st.container(border=True):
         st.session_state["step2_completed"] = True
         st.session_state["compliance_rate"] = 55
         st.session_state["val6"] = 55
-
-        else:
-            st.error(f"❌ {res['message']}")
-            st.session_state["step2_completed"] = False
-            st.session_state["compliance_rate"] = 42
-            st.session_state["val6"] = 42
+    else:
+        st.error(f"❌ {res['message']}")
+        st.session_state["step2_completed"] = False
+        st.session_state["compliance_rate"] = 42
+        st.session_state["val6"] = 42
