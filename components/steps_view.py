@@ -144,15 +144,13 @@ def render_steps_and_calculators(L, lang):
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    # ==================== 🔬 ثانياً: الفحوصات الجيوتقنية المطلوبة والمعطيات ====================
+       # ==================== 🔬 ثانياً: الفحوصات الجيوتقنية المطلوبة والمعطيات ====================
     stage_b_title = '🔬 المرحلة (ب): الفحوصات المطلوبة ونتائج تقرير المختبر' if lang == 'AR' else 'Stage (B): Required Tests & Laboratory Results'
     st.markdown(f"<h5 style='color: #3B82F6;'>{stage_b_title}</h5>", unsafe_allow_html=True)
     
-    # 🧠 طباعة قائمة الفحوصات المطلوبة استباقياً بناءً على فلترة المرحلة (أ)
     if building_floors > 0 and selected_gov != "":
         st.markdown(f"<b>📋 {'الفحوصات والاشتراطات الإلزامية المقرة لهذا المشروع كودياً:' if lang == 'AR' else 'Mandatory Code Requirements For This Project:'}</b>", unsafe_allow_html=True)
         
-        # أ. حساب حتمية الحفر والعمق ميكانيكياً
         if is_heavy_structure:
             bh_text = "• مطلوب 3 حفر اختبارية (Boreholes) كحد أدنى بعمق لا يقل عن 15 متراً لتأمين حسابات السرداب والأحمال." if lang == "AR" else "• Min 3 Boreholes required with depth >= 15m for basement/heavy loads."
         else:
@@ -162,31 +160,25 @@ def render_steps_and_calculators(L, lang):
                 bh_text = "• مطلوب 3 حفر اختبارية كحد أدنى بعمق لا يقل عن 6 أمتار لتجاوز مساحة الأرض 400 م²." if lang == "AR" else "• Min 3 Boreholes required with depth >= 6m due to area > 400m²."
         st.markdown(f"<span style='color:#1E40AF; font-size:0.85rem;'>{bh_text}</span>", unsafe_allow_html=True)
         
-        # ب. تفعيل فحص المياه الجوفية والقص للسرداب
         if has_basement:
             h2o_text = "• ⚠️ شرط حرج: يتوجب تدقيق منسوب المياه الجوفية الحركي الميداني وإجراء فحص التحليل الكيميائي لعدوانية المياه." if lang == "AR" else "• ⚠️ Critical: Groundwater level measurement & chemical aggressiveness tests are mandatory."
             st.markdown(f"<span style='color:#DC2626; font-size:0.85rem;'>{h2o_text}</span>", unsafe_allow_html=True)
             
-        # ج. فحص الجبس الجغرافي
         if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
             gyp_txt = f"• قيد جيوكيميائي: يقع الموقع ضمن نطاق التربة الجبسية، مطلوب فحص الجبس الكلي والانهيارية تحت النقع." if lang == "AR" else "• Gypseous Soil zone: Gypsum content & collapsible soil tests are mandatory."
             st.markdown(f"<span style='color:#B45309; font-size:0.85rem;'>{gyp_txt}</span>", unsafe_allow_html=True)
             
-        # د. فحص التكهفات في النجف والمثنى
         if selected_gov in ["Najaf", "Muthanna"]:
             void_txt = "• قيد جيولوجي خاص: مطلوب إرفاق فحص المسح الراداري الأرضي (GPR Void Scan) لضمان خلو الموقع من التكهفات الكلسية." if lang == "AR" else "• Geological Zone: GPR Void Scan is mandatory to rule out limestone cavities."
             st.markdown(f"<span style='color:#701A75; font-size:0.85rem;'>{void_txt}</span>", unsafe_allow_html=True)
             
         st.markdown("<br>", unsafe_allow_html=True)
 
-    # حقل رفع ملف الـ PDF الجيوتقني
     uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
     
     sub_col1, sub_col2 = st.columns(2)
     with sub_col1:
         bearing_cap = st.number_input(L['input_bearing'], min_value=10, max_value=500, value=120)
-        
-        # تصفية ديناميكية: يظهر حقل الجبس فقط في المحافظات الجبسية المقرة بالإكسل لراحة الفاحص
         if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
             gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=4.50)
         else:
@@ -200,7 +192,6 @@ def render_steps_and_calculators(L, lang):
         report_status_sel = st.selectbox(L['input_auth'], auth_opts)
         report_status = "معتمد ومجاز ومصادق" if report_status_sel == L['auth_yes'] else "غير مصادق"
         
-    # تشغيل الفحص والتحقق الرقمي السداسي المربوط بملف الإكسل
     if st.button(L['run_audit'], type="primary", use_container_width=True):
         if not selected_gov or not selected_req or not selected_usage or land_width == 0 or land_length == 0 or selected_corner == "":
             st.error("⚠️ يرجى ملء كافة محددات المرحلة (أ) الافتتاحية والموقع وتحديد الأبعاد وموضع قطعة الأرض أولاً.")
@@ -210,13 +201,13 @@ def render_steps_and_calculators(L, lang):
                 excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
                 
                 payload = {
-                    "governorate": selected_gov,
-                    "total_land_area_m2": user_area,
-                    "soil_bearing_capacity": bearing_cap,
-                    "soil_report_status": report_status, 
-                    "actual_gypsum_percentage": gypsum,
-                    "is_heavy_structure": is_heavy_structure,
-                    "actual_borehole_depth_meters": actual_bh_depth
+                    "governorate": selected_gov, "total_land_area_m2": user_area,
+                    "soil_bearing_capacity": bearing_cap, "soil_report_status": report_status, 
+                    "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
+                    "actual_borehole_depth_meters": actual_bh_depth,
+                    "lot_num": st.session_state.get("lot_num", ""),
+                    "sector_num": st.session_state.get("sector_num", ""),
+                    "building_floors": building_floors
                 }
                 
                 soil_result = excel_engine.validate_soil_report(payload)
@@ -226,9 +217,18 @@ def render_steps_and_calculators(L, lang):
                     st.success(soil_result["summary"])
                     st.session_state["compliance_rate"] = 68
                     st.session_state["step2_status"] = "Completed"
-                    st.rerun()
+                    
+                    # توليد الـ PDF عند النجاح وتثبيته في الذاكرة الحية للتحميل الإداري الفوري
+                    pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Success.pdf")
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(label="📥 تحميل شهادة المطابقة الرسمية (PDF)", data=f, file_name="Soil_Compliance_Success.pdf", mime="application/pdf", use_container_width=True)
                 else:
                     st.error(soil_result["summary"])
+                    
+                    # توليد الـ PDF عند الرفض لتضمين الرسائل السداسية
+                    pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Failures.pdf")
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(label="📥 تحميل تقرير المخالفات والرفض الرسمي (PDF)", data=f, file_name="Soil_Compliance_Failures.pdf", mime="application/pdf", use_container_width=True)
                     
                     for idx, failure in enumerate(soil_result["failures"], 1):
                         st.markdown(f"### ⚠️ المخالفة رقم {idx}:")
