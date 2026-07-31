@@ -73,7 +73,6 @@ def render_steps_and_calculators(L, lang):
     st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
     
     col_f1, col_f2, col_f3 = st.columns(3)
-    with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate / Project Scope:"
         gov_opts = {
             "اختر المحافظة...": "", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
@@ -83,22 +82,33 @@ def render_steps_and_calculators(L, lang):
             "أربيل": "Erbil", "السليمانية": "Sulaymaniyah", "دهوك": "Duhok"
         }
         gov_list = list(gov_opts.keys())
-        # تصحيح دالة البحث السريع لحساب الـ Index بدقة وبدون ValueError
-        current_saved = st.session_state["selected_gov"]
+        
+        # تصحيح دالة البحث السريع لحساب الـ Index وحمايتها بـ try لمنع أي ValueError نهائياً
         idx_gov = 0
-        if current_saved != "":
-            for k, v in gov_opts.items():
-                if v == current_saved:
-                    idx_gov = gov_list.index(k)
-                    break
+        try:
+            if st.session_state["selected_gov"] != "":
+                for k, v in gov_opts.items():
+                    if v == st.session_state["selected_gov"]:
+                        idx_gov = gov_list.index(k)
+                        break
+        except:
+            idx_gov = 0
                     
         selected_gov_txt = st.selectbox(gov_lbl, gov_list, index=idx_gov)
         st.session_state["selected_gov"] = gov_opts[selected_gov_txt]
         
         req_type_lbl = "نوع الطلب / المعاملة:" if lang == "AR" else "Request / Permit Type:"
         req_opts = ["", "بناء جديد", "إعادة بناء", "إضافة طابق", "ترميم", "مشاريع كبرى"] if lang == "AR" else ["", "New Construction", "Reconstruction", "Floor Addition", "Renovation", "Major Projects"]
-        idx_req = req_opts.index(st.session_state["selected_req"]) if st.session_state["selected_req"] in req_opts else 0
+        
+        idx_req = 0
+        try:
+            if st.session_state["selected_req"] in req_opts:
+                idx_req = req_opts.index(st.session_state["selected_req"])
+        except:
+            idx_req = 0
+            
         st.session_state["selected_req"] = st.selectbox(req_type_lbl, req_opts, index=idx_req)
+
 
         lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
         lot_num_val = st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5", key="lot_num")
