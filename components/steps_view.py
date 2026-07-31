@@ -2,7 +2,7 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """رسم شجرة الخطوات المفلترة هندسياً طبق الأصل وبأعلى دقة وثبات"""
+    """رسم وإدارة شجرة الخطوات المفلترة هندسياً طبق الأصل وبأعلى دقة وثبات"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
@@ -26,7 +26,7 @@ def render_steps_and_calculators(L, lang):
             }
         </style>
     """, unsafe_allow_html=True)
-    # تفعيل وإرساء قيم الذاكرة الحية للمحددات الـ 12 لمنع تصفير الحقول
+    # تهيئة وحفظ قيم الجلسة الحية للمحددات الـ 12 لمنع التصفير التلقائي لـ ستريملت
     if "selected_gov" not in st.session_state: st.session_state["selected_gov"] = ""
     if "selected_req" not in st.session_state: st.session_state["selected_req"] = ""
     if "selected_usage" not in st.session_state: st.session_state["selected_usage"] = ""
@@ -36,7 +36,7 @@ def render_steps_and_calculators(L, lang):
     if "land_length" not in st.session_state: st.session_state["land_length"] = 0.0
     if "building_floors" not in st.session_state: st.session_state["building_floors"] = 0
 
-    # حساب منطق الجاهزية الحية: هل أدخل المدقق كافة الحقول الأساسية؟
+    # 🧠 فحص الجاهزية الحية: إذا كانت الخيارات فارغة أو الأبعاد أصفار، فالخطوة 1 غير مكتملة
     is_step1_ready = (
         st.session_state["selected_gov"] != "" and 
         st.session_state["selected_req"] != "" and 
@@ -48,14 +48,15 @@ def render_steps_and_calculators(L, lang):
         st.session_state["building_floors"] > 0
     )
 
-    # تحديد ألوان وحالة الصندوق الأول بناءً على اكتمال تعبئة البيانات
     if is_step1_ready:
-        step1_border, step1_badge, step1_badge_clr = "#10B981", L['completed'], "#10B981"
+        step1_border = "#10B981"
+        step1_badge = L['completed']
+        step1_badge_clr = "#10B981"
     else:
         step1_border = "#F59E0B"
         step1_badge = "🟡 يرجى إدخال البيانات الموقعية" if lang == "AR" else "🟡 Please Input Zoning Data"
         step1_badge_clr = "#F59E0B"
-       # --- 🏢 الخطوة 1: تحليل الموقع والمحددات البلدية الـ 12 للعقار ---
+    # ==================== 🏢 الخطوة 1: تحليل الموقع والمحددات البلدية الـ 12 للعقار ====================
     st.markdown(f"""
     <div dir="{direction}" style="border: 1px solid {step1_border}; padding: 15px; border-radius: 14px; background-color: white; margin-bottom: 12px; text-align: {align}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 8px; padding-left: 8px;">
@@ -73,6 +74,7 @@ def render_steps_and_calculators(L, lang):
     st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
     
     col_f1, col_f2, col_f3 = st.columns(3)
+    with col_f1:
         gov_lbl = "المحافظة ونطاق المشروع الجغرافي:" if lang == "AR" else "Governorate / Project Scope:"
         gov_opts = {
             "اختر المحافظة...": "", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", 
@@ -83,7 +85,6 @@ def render_steps_and_calculators(L, lang):
         }
         gov_list = list(gov_opts.keys())
         
-        # تصحيح دالة البحث السريع لحساب الـ Index وحمايتها بـ try لمنع أي ValueError نهائياً
         idx_gov = 0
         try:
             if st.session_state["selected_gov"] != "":
@@ -96,29 +97,28 @@ def render_steps_and_calculators(L, lang):
                     
         selected_gov_txt = st.selectbox(gov_lbl, gov_list, index=idx_gov)
         st.session_state["selected_gov"] = gov_opts[selected_gov_txt]
-        
         req_type_lbl = "نوع الطلب / المعاملة:" if lang == "AR" else "Request / Permit Type:"
         req_opts = ["", "بناء جديد", "إعادة بناء", "إضافة طابق", "ترميم", "مشاريع كبرى"] if lang == "AR" else ["", "New Construction", "Reconstruction", "Floor Addition", "Renovation", "Major Projects"]
-        
         idx_req = 0
         try:
             if st.session_state["selected_req"] in req_opts:
                 idx_req = req_opts.index(st.session_state["selected_req"])
         except:
             idx_req = 0
-            
         st.session_state["selected_req"] = st.selectbox(req_type_lbl, req_opts, index=idx_req)
 
-
         lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
         lot_num_val = st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5", key="lot_num")
 
-        lot_num_lbl = "رقم قطعة العقار (سند طابو):" if lang == "AR" else "Plot / Parcel Number:"
-        lot_num_val = st.text_input(lot_num_lbl, value="", placeholder="مثال: 1024/5", key="lot_num")
     with col_f2:
         usage_lbl = "نوع استعمال العقار الأساسي:" if lang == "AR" else "Primary Land Usage:"
         usage_opts = ["", "سكني", "تجاري", "خدمي", "صناعي", "مجمعات"] if lang == "AR" else ["", "Residential", "Commercial", "Service", "Industrial", "Complexes"]
-        idx_use = usage_opts.index(st.session_state["selected_usage"]) if st.session_state["selected_usage"] in usage_opts else 0
+        idx_use = 0
+        try:
+            if st.session_state["selected_usage"] in usage_opts:
+                idx_use = usage_opts.index(st.session_state["selected_usage"])
+        except:
+            idx_use = 0
         st.session_state["selected_usage"] = st.selectbox(usage_lbl, usage_opts, index=idx_use)
 
         width_lbl = "عرض الأرض / الواجهة (متر):" if lang == "AR" else "Land Width / Frontage (meters):"
@@ -126,7 +126,6 @@ def render_steps_and_calculators(L, lang):
 
         sector_num_lbl = "رقم المقاطعة والبلدية للعقار:" if lang == "AR" else "District / Sector Number:"
         sector_num_val = st.text_input(sector_num_lbl, value="", placeholder="مثال: 42 مكة", key="sector_num")
-
     with col_f3:
         street_lbl = "عرض الشارع المقابل للعقار (m):" if lang == "AR" else "Opposite Street Width (m):"
         street_width = st.number_input(street_lbl, min_value=0.0, max_value=100.0, value=0.0, step=0.5)
@@ -136,14 +135,24 @@ def render_steps_and_calculators(L, lang):
 
         corner_lbl = "موضع قطعة الأرض وتصنيفها:" if lang == "AR" else "Plot Orientation Class:"
         corner_opts = ["", "عادي / وسطي", "ركن / زاوية"] if lang == "AR" else ["", "Standard / Middle", "Corner Plot"]
-        idx_crn = corner_opts.index(st.session_state["selected_corner"]) if st.session_state["selected_corner"] in corner_opts else 0
+        idx_crn = 0
+        try:
+            if st.session_state["selected_corner"] in corner_opts:
+                idx_crn = corner_opts.index(st.session_state["selected_corner"])
+        except:
+            idx_crn = 0
         st.session_state["selected_corner"] = st.selectbox(corner_lbl, corner_opts, index=idx_crn)
 
     col_sub_f1, col_sub_f2 = st.columns(2)
     with col_sub_f1:
         basement_lbl = "هل يتضمن المخطط طابق سرداب (Basement)؟" if lang == "AR" else "Does it include a Basement floor?"
         basement_opts = ["", "موجود", "غير موجود"] if lang == "AR" else ["", "Present", "Not Present"]
-        idx_bsm = basement_opts.index(st.session_state["has_basement_sel"]) if st.session_state["has_basement_sel"] in basement_opts else 0
+        idx_bsm = 0
+        try:
+            if st.session_state["has_basement_sel"] in basement_opts:
+                idx_bsm = basement_opts.index(st.session_state["has_basement_sel"])
+        except:
+            idx_bsm = 0
         st.session_state["has_basement_sel"] = st.selectbox(basement_lbl, basement_opts, index=idx_bsm)
         has_basement = True if st.session_state["has_basement_sel"] in ["موجود", "Present"] else False
 
@@ -213,32 +222,6 @@ def render_steps_and_calculators(L, lang):
         
         st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
         
-        # طباعة شجرة الفحوصات المستنتجة كودياً
-        st.markdown(f"<div class='compliance-card' style='background-color: #FAFAFA; border: 1px dashed #CBD5E1; padding:12px; margin-bottom:12px;'>", unsafe_allow_html=True)
-        st.markdown(f"<b>📋 {'الفحوصات والاشتراطات الإلزامية المقرة لهذا المشروع كودياً:' if lang == 'AR' else 'Mandatory Code Requirements For This Project:'}</b>", unsafe_allow_html=True)
-        
-        if is_heavy_structure:
-            bh_text = "• مطلوب 3 حفر اختبارية (Boreholes) كحد أدنى بعمق لا يقل عن 15 متراً لتأمين حسابات السرداب والأحمال الثقيلة." if lang == "AR" else "• Min 3 Boreholes required with depth >= 15m for basement/heavy loads."
-        else:
-            if user_area <= 400:
-                bh_text = "• مطلوب حفرتان اختباريتان فقط (Boreholes) بعمق لا يقل عن 6 أمتار بموجب مساحة الأرض المستنتجة (الجدول 2-1)." if lang == "AR" else "• 2 Boreholes required with depth >= 6m based on land area."
-            else:
-                bh_text = "• مطلوب 3 حفر اختبارية كحد أدنى بعمق لا يقل عن 6 أمتار لتجاوز مساحة الأرض 400 م²." if lang == "AR" else "• Min 3 Boreholes required with depth >= 6m due to area > 400m²."
-        st.markdown(f"<div style='color:#1E40AF; font-size:0.82rem; margin-top:4px;'>{bh_text}</div>", unsafe_allow_html=True)
-        
-        if has_basement:
-            h2o_text = "• ⚠️ شرط حرج: يتوجب تدقيق منسوب المياه الجوفية الحركي الميداني وإجراء فحص التحليل الكيميائي لعدوانية المياه الجوفية." if lang == "AR" else "• ⚠️ Critical: Groundwater level measurement & chemical aggressiveness tests are mandatory."
-            st.markdown(f"<div style='color:#DC2626; font-size:0.82rem; margin-top:2px;'>{h2o_text}</div>", unsafe_allow_html=True)
-            
-        if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"]:
-            gyp_txt = f"• قيد جيوكيميائي: يقع الموقع ضمن نطاق التربة الجبسية، مطلوب فحص الجبس الكلي والانهيارية تحت النقع المستمر." if lang == "AR" else "• Gypseous Soil zone: Gypsum content & collapsible soil tests are mandatory."
-            st.markdown(f"<div style='color:#B45309; font-size:0.82rem; margin-top:2px;'>{gyp_txt}</div>", unsafe_allow_html=True)
-            
-        if selected_gov in ["Najaf", "Muthanna"]:
-            void_txt = "• قيد جيولوجي خاص: مطلوب إرفاق فحص المسح الراداري الأرضي (GPR Void Scan) لضمان خلو الموقع من التكهفات الكلسية." if lang == "AR" else "• Geological Zone: GPR Void Scan is mandatory to rule out limestone cavities."
-            st.markdown(f"<div style='color:#701A75; font-size:0.82rem; margin-top:2px;'>{void_txt}</div>", unsafe_allow_html=True)
-            
-        st.markdown("</div>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
         sub_col1, sub_col2, sub_col3 = st.columns(3)
         with sub_col1:
