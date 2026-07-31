@@ -14,9 +14,7 @@ st.markdown("""
         [data-testid="stSidebarNav"], [data-testid="collapsedControl"], section[data-testid="stSidebar"] {
             display: none !important;
         }
-        .main .block-container {
-            padding: 1.5rem 2rem !important; max-width: 100% !important;
-        }
+        .main .block-container { padding: 1.5rem 2rem !important; max-width: 100% !important; }
         body, .main { background-color: #F8FAFC !important; }
         div.stButton > button {
             background-color: white !important; color: #4B5563 !important;
@@ -27,14 +25,8 @@ st.markdown("""
             justify-content: flex-start !important; gap: 12px !important;
             margin-bottom: 8px !important; transition: all 0.25s ease !important;
         }
-        div.stButton > button[type="primary"] {
-            background-color: #EFF6FF !important; color: #1E3A8A !important;
-            border: 1px solid #3B82F6 !important;
-        }
-        div.stButton > button:hover {
-            border-color: #3B82F6 !important; color: #1E3A8A !important;
-            background-color: #F0FDF4 !important; transform: translateY(-1px) !important;
-        }
+        div.stButton > button[type="primary"] { background-color: #EFF6FF !important; color: #1E3A8A !important; border: 1px solid #3B82F6 !important; }
+        div.stButton > button:hover { border-color: #3B82F6 !important; color: #1E3A8A !important; background-color: #F0FDF4 !important; transform: translateY(-1px) !important; }
         .stSelectbox, .stNumberInput, .stTextInput { background-color: white !important; border-radius: 10px !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -45,12 +37,13 @@ if "active_gate" not in st.session_state: st.session_state["active_gate"] = "gat
 if "compliance_rate" not in st.session_state: st.session_state["compliance_rate"] = 42
 if "step2_status" not in st.session_state: st.session_state["step2_status"] = "In Progress"
 
-# 4. استدعاء الترويسة والمكونات الهندسية الكبرى
+# 4. استدعاء الترويسة ومكونات المنصة الهندسية الكبرى من مساراتها النظيفة
 from components.header import render_header
 from components.steps_view import render_steps_and_calculators
 from components.sidebar_metrics import render_sidebar_analytics
-# استدعاء الموزع الحاكم للبوابة الثانية المطور
 from components.gate2_sustainability import render_sustainability_gate
+# استدعاء واجهة البوابة الثالثة الإحصائية المعزولة والمحميّة حديثاً بالملي
+from components.gate3.gate3_main import render_analytics_gate
 
 L = render_header()
 lang = st.session_state["lang"]
@@ -73,10 +66,10 @@ with col_center_stage:
     if current_gate == "gate_1":
         render_steps_and_calculators(L, lang)
     elif current_gate == "gate_2":
-        # 🚀 الاستدعاء الصحيح والحاسم والمستقل لتشغيل واجهة الاستدامة الفرعية والعزل والتكييف
         render_sustainability_gate(L, lang, direction, align)
     elif current_gate == "gate_3":
-        st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: {align};'><h3>{L['gate_3_title']}</h3><p style='color:#6B7280;'>⏳ لوحة الرسوم البيانية الإحصائية للمشروعات قيد الهندسة...</p></div>", unsafe_allow_html=True)
+        # تشغيل واستدعاء لوحة التحليلات والإحصائيات البيانية المستقلة للبوابة الثالثة
+        render_analytics_gate(L, lang, direction, align)
     elif current_gate == "gate_4":
         st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: {align};'><h3>{L['gate_4_title']}</h3><p style='color:#6B7280;'>🗺️ <b>خارطة العراق الرقمية:</b> جاري ربط قواعد البيانات الجغرافية GIS...</p></div>", unsafe_allow_html=True)
     elif current_gate == "gate_5":
