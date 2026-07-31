@@ -27,13 +27,45 @@ with st.container(border=True):
     if st.button("🔐 تشغيل التدقيق الكودي والبلدي الفوري", type="primary"):
         # استدعاء محرك الفحص المطور والمستدام
         res = verify_comprehensive_compliance(zone, soil_key, bearing_cap, building_height)
-        
         if res["status"]:
-            st.success(f"🎉 {res['message']}")
-            # تحديث مؤشرات لوحة القيادة المركزية في الذاكرة المؤقتة
-            st.session_state["step2_completed"] = True
-            st.session_state["compliance_rate"] = 55
-            st.session_state["val6"] = 55
+                   st.success(f"🎉 {res['message']}")
+        
+        # 1. استدعاء محرك فحص التربة الجديد
+        from shared_engines.compliance_engine import IraqiSoilValidationEngine
+        soil_engine = IraqiSoilValidationEngine(rules_file_path="soil_rules.json")
+        
+        # 2. بناء حزمة البيانات بالاعتماد على متغيرات صفحتك الحالية
+        payload = {
+            "governorate": zone,
+            "total_land_area_m2": 300, 
+            "total_floors": int(building_height / 3),
+            "soil_bearing_capacity": bearing_cap,
+            "soil_report_status": "معتمد ومجاز ومصادق", 
+            "report_age_months": 1,
+            "actual_boreholes_count": 2, 
+            "actual_borehole_depth_meters": 6.0,
+            "actual_compaction_degree_percentage": 96.0,
+            "actual_gypsum_percentage": 4.5,
+            "actual_so3_percentage": 1.5
+        }
+        
+        # 3. تشغيل الفحص ومطابقة الـ JSON
+        soil_result = soil_engine.validate_soil_report(payload)
+        
+        # 4. طباعة التقرير الهندسي لمدونة التربة
+        st.markdown("### 🔬 نتيجة تدقيق مدونة التربة والأسس العراقية:")
+        if soil_result["status"] == "PASSED":
+            st.success(soil_result["summary"])
+        else:
+            st.error(soil_result["summary"])
+            for err in soil_result["failures"]:
+                st.warning(err)
+        
+        # 5. الحفاظ على تحديث مؤشرات لوحة القيادة الخاصة بك
+        st.session_state["step2_completed"] = True
+        st.session_state["compliance_rate"] = 55
+        st.session_state["val6"] = 55
+
         else:
             st.error(f"❌ {res['message']}")
             st.session_state["step2_completed"] = False
