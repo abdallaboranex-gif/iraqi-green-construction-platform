@@ -52,7 +52,7 @@ def get_translations():
             "dl_btn": "تحميل تقرير محددات الموقع المقر بلديّاً",
             "file_uploader_lbl": "(Soil Lab PDF) سحب وإفلات تقرير فحص التربة المختبري والمصادق عليه هنا",
             
-            # حقول مدخلات الواجهة المحددة بدقة لطلبك
+            # حقول مدخلات الواجهة
             "input_bearing": "قدرة تحمل التربة المقاسة المختبرية القصوى (kPa):",
             "input_gypsum": "محتوى ونسبة الجبس الكلية الكيميائية في التربة (%):",
             "input_height": "الارتفاع الكلي للمبنى المعماري المصمم من وجه الأرض (متر):",
@@ -60,7 +60,21 @@ def get_translations():
             "auth_yes": "معتمد ومجاز ومصادق برقم نقابي استشاري حقيقي",
             "auth_no": "غير مصادق / فحص مكتب عشوائي غير معتمد بلديّاً",
             "run_audit": "🚨 تشغيل التدقيق الكودي والبلدي الفوري الشامل للمخططات",
-            "soil_report_header": "#### 🔬 تقرير مطابقة مدونة التربة والأسس العراقية القائم على ملف الإكسل والداتا الحية:"
+            "soil_report_header": "#### 🔬 تقرير مطابقة مدونة التربة والأسس العراقية القائم على ملف الإكسل والداتا الحية:",
+            
+            # بنر الاشتراك المهني والبريميوم لتأمين عمل الكود بالملي
+            "premium_title": "👑 الاشتراك في الحزمة المهنية المدفوعة الموحدة",
+            "premium_desc": "تفعيل كافة الحاسبات الآلية الـ 14 للمطابقة الكودية المباشرة والربط الرقمي بالوزارات والبلديات العراقيّة.",
+            "dashboard_title": "لوحة التحليلات والمؤشرات المركزية للتنفيذ",
+            "sustainability_title": "🌱 الأثر البيئي ومؤشرات الاستدامة",
+            "green_score": "التقييم الأخضر للمبنى",
+            "co2_reduction": "إمكانيات خفض الانبعاثات الكاربونية",
+            "co2_val": "128.5 طن / سنوياً برؤية بيئية",
+            "timeline_title": "📅 الجداول الزمنية وميزانيات المشروع",
+            "duration_lbl": "المدة الزمنية المنقضية للمشروع:",
+            "budget_lbl": "ملخص الميزانية المرصودة والمستهلكة:",
+            "duration_val": "42 / 300 يوم فعلي (14%)",
+            "budget_val": "1.28 مليون $ / 7.00 مليون $ (18%)"
         },
         "EN": {
             "title": "🏢 Sovereign Iraqi Green Construction Data Platform",
@@ -103,7 +117,21 @@ def get_translations():
             "auth_yes": "Authorized and Certified by Syndicate",
             "auth_no": "Unverified / Non-certified Unofficial Lab",
             "run_audit": "🚨 Run Instant Code & Municipal Audit",
-            "soil_report_header": "#### 🔬 Iraqi Soil Code Matching Report Generated from Live Database Asset:"
+            "soil_report_header": "#### 🔬 Iraqi Soil Code Matching Report Generated from Live Database Asset:",
+            
+            # Premium Pack & Stats Dictionary Keys
+            "premium_title": "👑 Subscribe to Premium Professional Pack",
+            "premium_desc": "Unlock all 14 automated compliance calculators and background verification hooks with ministries.",
+            "dashboard_title": "Executive Analytics Dashboard",
+            "sustainability_title": "🌱 Sustainability Impact Metrics",
+            "green_score": "Green Score",
+            "co2_reduction": "CO₂ Reduction Potential",
+            "co2_val": "128.5 Tons / Year",
+            "timeline_title": "📅 Project Timeline & Cost Overview",
+            "duration_lbl": "Project Duration:",
+            "budget_lbl": "Budget Overview:",
+            "duration_val": "42 / 300 Days (14%)",
+            "budget_val": "$1.28M / $7.00M (18%)"
         }
     }
 
