@@ -44,7 +44,7 @@ def render_steps_and_calculators(L, lang):
         f_floors = st.number_input("عدد الطوابق فوق الأرض:" if lang == "AR" else "Floors Above Ground:", min_value=0, max_value=60, key="w_floors")
         
         # حقل الاتجاه الجغرافي (المحدد رقم 13)
-        dir_opts = ["", "شمالي", "جنوبي", "شرقي", "غربي", "شمالي شرقي", "شمالي غربis", "جنوبي شرقي", "جنوبي غربي"] if lang == "AR" else ["", "North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"]
+        dir_opts = ["", "شمالي", "جنوبي", "شرقي", "غربي", "شمالي شرقي", "شمالي غربي", "جنوبي شرقي", "جنوبي غربي"] if lang == "AR" else ["", "North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"]
         st.selectbox("اتجاه واجهة المبنى الجغرافية:" if lang == "AR" else "Frontage Orientation:", dir_opts, key="w_orient")
         st.markdown("</div>", unsafe_allow_html=True)
         # 3. محرك الاستنتاج الذكي للمساحة وثقل المنشأ وتوليد شجرة الفحوصات
