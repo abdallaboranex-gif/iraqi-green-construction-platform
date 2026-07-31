@@ -4,7 +4,7 @@ import os
 import streamlit as st
 
 class IraqiDynamicComplianceEngine:
-    def __init__(self, excel_filename="soil_investigation_code.xlsx"):
+    def __init__(self, excel_filename="soil_testing.xlsx"):
         """توجيه المحرك ليفتح ملف الإكسل المخصص للمدونة المحددة داخل مجلد data"""
         self.excel_path = os.path.join("data", excel_filename)
 
