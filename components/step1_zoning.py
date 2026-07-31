@@ -86,7 +86,7 @@ def render_step1(L, lang, direction, align):
     if building_floors >= 0 and user_area > 0:
         is_heavy = building_floors >= 4 or has_basement
         class_txt = "🏢 منشأ ثقيل / أحمال حرجة" if is_heavy else "🏡 منشأ خفيف / أحمال اعتيادية"
-        class_clr = "#DC2626" if is_heavy_structure else "#10B981"
+        class_clr = "#DC2626" if is_heavy else "#10B981"
         st.markdown(f"<div style='background-color:#F8FAFC; padding:8px; border-right:4px solid {class_clr}; font-size:0.85rem; font-weight:bold; color:{class_clr}; text-align:{align};'>{class_txt} | المساحة: {user_area:.1f} m²</div>", unsafe_allow_html=True)
 
     st.markdown("</div></div>", unsafe_allow_html=True)
