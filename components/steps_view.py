@@ -221,51 +221,57 @@ def render_steps_and_calculators(L, lang):
         """, unsafe_allow_html=True)
         
         st.markdown(f'<div dir="{direction}" style="text-align: {align}; padding: 5px 10px;">', unsafe_allow_html=True)
-        
-        uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
+                uploaded_file = st.file_uploader(L['file_uploader_lbl'], type=["pdf"])
         sub_col1, sub_col2, sub_col3 = st.columns(3)
         with sub_col1:
-            bearing_cap = st.number_input(L['input_bearing'], min_value=10, max_value=500, value=120)
-            gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=4.50) if selected_gov in ["Salah_Al_Din", "Anbar", "Najaf", "Nineveh"] else 1.0
+            # تصفير القيمة الافتراضية لقدرة التحمل والجبس
+            bearing_cap = st.number_input(L['input_bearing'], min_value=0, max_value=500, value=0)
+            gypsum = st.number_input(L['input_gypsum'], min_value=0.0, max_value=100.0, value=0.0, step=0.1) if selected_gov in ["Salah_Al_Din", "Anbar", "Najاف", "Nineveh"] else 0.0
         with sub_col2:
             actual_bh_depth_lbl = "أقصى عمق للحفرة ميدانياً (متر):" if lang == "AR" else "Max Borehole Depth (m):"
-            actual_bh_depth = st.number_input(actual_bh_depth_lbl, min_value=0.0, max_value=120.0, value=6.0, step=0.5)
-            report_status_sel = st.selectbox(L['input_auth'], [L['auth_yes'], L['auth_no']])
-            report_status = "معتمد ومجاز ومصادق" if report_status_sel == L['auth_yes'] else "غير مصادق"
+            # تصفير عمق الحفر الاختباري الافتراضي
+            actual_bh_depth = st.number_input(actual_bh_depth_lbl, min_value=0.0, max_value=120.0, value=0.0, step=0.5)
+            report_status_sel = st.selectbox(L['input_auth'], ["", L['auth_yes'], L['auth_no']])
+            report_status = "معتمد ومجاز ومصادق" if report_status_sel == L['auth_yes'] else ("غير مصادق" if report_status_sel == L['auth_no'] else "")
         with sub_col3:
             if has_basement:
                 water_table_lbl = "منسوب المياه الجوفية المقاس (متر):" if lang == "AR" else "Water Table (m):"
-                water_table = st.number_input(water_table_lbl, min_value=0.0, max_value=50.0, value=1.5, step=0.1)
+                # تصفير منسوب المياه الجوفية المقاس
+                water_table = st.number_input(water_table_lbl, min_value=0.0, max_value=50.0, value=0.0, step=0.1)
                 water_chem_lbl = "فحص عدوانية المياه الجوفية:" if lang == "AR" else "Water Aggressiveness:"
-                w_opts = ["مطابق وضمن الحدود الآمنة", "عدواني جداً"] if lang == "AR" else ["Compliant", "Highly Aggressive"]
+                w_opts = ["", "مطابق وضمن الحدود الآمنة", "عدواني جداً"] if lang == "AR" else ["", "Compliant", "Highly Aggressive"]
                 water_chem_status = st.selectbox(water_chem_lbl, w_opts)
             else:
                 water_table, water_chem_status = 20.0, "مطابق وضمن الحدود الآمنة"
             
         if st.button(L['run_audit'], type="primary", use_container_width=True):
-            try:
-                from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
-                excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
-                payload = {
-                    "governorate": selected_gov, "total_land_area_m2": user_area, "soil_bearing_capacity": bearing_cap,
-                    "soil_report_status": report_status, "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
-                    "actual_borehole_depth_meters": actual_bh_depth, "lot_num": lot_num_val, "sector_num": sector_num_val,
-                    "building_floors": building_floors, "water_table_meters": water_table, "water_chemical_status": water_chem_status
-                }
-                soil_result = excel_engine.validate_soil_report(payload)
-                st.markdown(L['soil_report_header'])
-                if soil_result["status"] == "PASSED":
-                    st.success(soil_result["summary"])
-                    st.session_state["compliance_rate"], st.session_state["step2_status"] = 68, "Completed"
-                    st.rerun()
-                else:
-                    st.error(soil_result["summary"])
-                    pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Failures.pdf")
-                    with open(pdf_path, "rb") as f:
-                        st.download_button(label="📥 تحميل تقرير المخالفات والرفض الرسمي (PDF)", data=f, file_name="Soil_Compliance_Failures.pdf", mime="application/pdf", use_container_width=True)
-                    for idx, failure in enumerate(soil_result["failures"], 1):
-                        st.markdown(f"<div class='compliance-card'>### ⚠️ المخالفة {idx}: **{failure['title']}**<br><small>{failure['severity']}</small><br>💬 {failure['citizen_exp']}<br>🔧 {failure['engineer_exp']}<br>✅ {failure['resolution']}<br>🚨 {failure['legal_penalty']}</div>", unsafe_allow_html=True)
-            except Exception as e: st.error(f"حدث خطأ في المعالجة: {str(e)}")
+            # قيد حماية: منع الفحص إذا تركت حقول المختبر أصفاراً أو فارغة
+            if bearing_cap == 0 or actual_bh_depth == 0 or report_status == "" or (has_basement and water_chem_status == ""):
+                st.error("⚠️ يرجى إدخال كافة نتائج الفحوصات المختبرية وحالة الاعتمادية أولاً.")
+            else:
+                try:
+                    from shared_engines.compliance_engine import IraqiDynamicComplianceEngine
+                    excel_engine = IraqiDynamicComplianceEngine(excel_filename="soil_testing.xlsx")
+                    payload = {
+                        "governorate": selected_gov, "total_land_area_m2": user_area, "soil_bearing_capacity": bearing_cap,
+                        "soil_report_status": report_status, "actual_gypsum_percentage": gypsum, "is_heavy_structure": is_heavy_structure,
+                        "actual_borehole_depth_meters": actual_bh_depth, "lot_num": lot_num_val, "sector_num": sector_num_val,
+                        "building_floors": building_floors, "water_table_meters": water_table, "water_chemical_status": water_chem_status
+                    }
+                    soil_result = excel_engine.validate_soil_report(payload)
+                    st.markdown(L['soil_report_header'])
+                    if soil_result["status"] == "PASSED":
+                        st.success(soil_result["summary"])
+                        st.session_state["compliance_rate"], st.session_state["step2_status"] = 68, "Completed"
+                        st.rerun()
+                    else:
+                        st.error(soil_result["summary"])
+                        pdf_path = excel_engine.generate_pdf_report(payload, soil_result, "Soil_Compliance_Failures.pdf")
+                        with open(pdf_path, "rb") as f:
+                            st.download_button(label="📥 تحميل تقرير المخالفات والرفض الرسمي (PDF)", data=f, file_name="Soil_Compliance_Failures.pdf", mime="application/pdf", use_container_width=True)
+                        for idx, failure in enumerate(soil_result["failures"], 1):
+                            st.markdown(f"<div class='compliance-card'>### ⚠️ المخالفة {idx}: **{failure['title']}**<br><small>{failure['severity']}</small><br>💬 {failure['citizen_exp']}<br>🔧 {failure['engineer_exp']}<br>✅ {failure['resolution']}<br>🚨 {failure['legal_penalty']}</div>", unsafe_allow_html=True)
+                except Exception as e: st.error(f"حدث خطأ في معالجة: {str(e)}")
         st.markdown("</div></div>", unsafe_allow_html=True)
 
     st.markdown(f"<div style='text-align: center; color: #D1D5DB; margin: -12px 0; font-size: 1.1rem;'>│</div>", unsafe_allow_html=True)
