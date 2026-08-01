@@ -9,27 +9,32 @@ st.set_page_config(
 )
 
 # 2. حقن الـ CSS المركزي المتقدم لقلب هوية ستريملت ومطابقة الأبعاد بالملي
-st.markdown("""
-    <style>
-        [data-testid="stSidebarNav"], [data-testid="collapsedControl"], section[data-testid="stSidebar"] {
-            display: none !important;
-        }
-        .main .block-container { padding: 1.5rem 2rem !important; max-width: 100% !important; }
-        body, .main { background-color: #F8FAFC !important; }
-        div.stButton > button {
-            background-color: white !important; color: #4B5563 !important;
-            border: 1px solid #E5E5E5 !important; border-radius: 12px !important;
-            padding: 14px 18px !important; font-size: 0.92rem !important;
-            font-weight: 600 !important; text-align: right !important;
-            display: flex !important; align-items: center !important;
-            justify-content: flex-start !important; gap: 12px !important;
-            margin-bottom: 8px !important; transition: all 0.2s ease !important;
-        }
-        div.stButton > button[type="primary"] { background-color: #EFF6FF !important; color: #1E3A8A !important; border: 1px solid #3B82F6 !important; }
-        div.stButton > button:hover { border-color: #3B82F6 !important; color: #1E3A8A !important; background-color: #F0FDF4 !important; transform: translateY(-1px) !important; }
-        .stSelectbox, .stNumberInput, .stTextInput { background-color: white !important; border-radius: 10px !important; }
-    </style>
-""", unsafe_allow_html=True)
+# components/steps_view.py
+import streamlit as st
+
+def render_steps_and_calculators(L, lang):
+    """منظومة الخطوات التتابعية بأمان بايثون الصافي 100%"""
+    direction = "rtl" if lang == "AR" else "ltr"
+    align = "right" if lang == "AR" else "left"
+
+    # تقسيم الشاشة لخمسة أعمدة صغيرة متوازية لتمثيل الـ 5 خطوات
+    s_col1, s_col2, s_col3, s_col4, s_col5 = st.columns(5)
+    with s_col1:
+        st.info("✓ الخطوة 1" if lang=="AR" else "✓ Step 1")
+    with s_col2:
+        st.success("⏳ الخطوة 2" if lang=="AR" else "⏳ Step 2")
+    with s_col3:
+        st.text("🔒 الخطوة 3" if lang=="AR" else "🔒 Step 3")
+    with s_col4:
+        st.text("🔒 الخطوة 4" if lang=="AR" else "🔒 Step 4")
+    with s_col5:
+        st.text("🔒 الخطوة 5" if lang=="AR" else "🔒 Step 5")
+
+    st.markdown("---")
+    
+    # حقول الإدخال والمقاييس لـ (الخطوة 1) تبدأ مباشرة هنا بالسطر التالي
+    with st.container(border=True):
+        st.markdown(f"<div style='text-align: {align}; font-weight: bold; color: #1E293B; margin-bottom: 12px;'>📋 معطيات الموقع والمحددات الحالية:</div>", unsafe_allow_html=True)
 
 # 3. تأمين قيم الذاكرة الافتتاحية للمنصة في الجلسة الحية لمنع الـ KeyError
 if "lang" not in st.session_state: st.session_state["lang"] = "AR"
