@@ -36,14 +36,15 @@ if "active_gate" not in st.session_state: st.session_state["active_gate"] = "gat
 if "compliance_rate" not in st.session_state: st.session_state["compliance_rate"] = 42
 if "step2_status" not in st.session_state: st.session_state["step2_status"] = "In Progress"
 
-# 4. استدعاء الترويسة ومكونات المنصة الهندسية الكبرى من مساراتها المعزولة
+# 4. استدعاء الترويسة ومكونات المنصة الهندسية الكبرى من مساراتها النظيفة المعزولة
 from components.header import render_header
 from components.steps_view import render_steps_and_calculators
 from components.sidebar_metrics import render_sidebar_analytics
 from components.gate2_sustainability import render_sustainability_gate
 from components.gate3.gate3_main import render_analytics_gate
-# استدعاء واجهة البوابة الرابعة الاستشرافية التفاعلية الجديدة
 from components.gate4.gate4_main import render_sovereign_map_gate
+# استدعاء واجهة البوابة الخامسة المالية وجباية الرسوم الإلكترونية الجديدة بالملي
+from components.gate5.gate5_main import render_billing_gate
 
 L = render_header()
 lang = st.session_state["lang"]
@@ -69,10 +70,10 @@ with col_center_stage:
     elif current_gate == "gate_3":
         render_analytics_gate(L, lang, direction, align)
     elif current_gate == "gate_4":
-        # 🚀 تشغيل واستدعاء البوابة الرابعة: خارطة العراق الذكية ودعم القرار الاقتصادي
         render_sovereign_map_gate(L, lang, direction, align)
     elif current_gate == "gate_5":
-        st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: {align};'><h3>{L['gate_5_title']}</h3><p style='color:#6B7280;'>💳 بوابة البنية التحتية للاشتراكات والدفع الإلكتروني الحكومي...</p></div>", unsafe_allow_html=True)
+        # 🚀 تشغيل واستدعاء البوابة الخامسة: جباية الرسوم الإلكترونية وفواتير واشتراكات المكاتب حياً
+        render_billing_gate(L, lang, direction, align)
     elif current_gate == "gate_6":
         st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: {align};'><h3>{L['gate_6_title']}</h3><p style='color:#6B7280;'>📷 منظومة التفتيش الرقمي الميداني واستقبال صور الكشف البلدي الموقعي...</p></div>", unsafe_allow_html=True)
 
