@@ -6,21 +6,19 @@ def render_steps_and_calculators(L, lang):
     """رسم بوابات التدقيق المتسلسلة والمقفلة بمكونات احترافية جاهزة ومصقولة عالمياً"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
-
-    # 1. شريط الخطوات المتطورة والأقفال الذكية الجاهز والمطابق للتصميم تماماً
+    # 1. شريط الخطوات المتطورة الجاهز والمبني بأعلى دقة توافقية سحابية
     st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
     sac.steps(
         items=[
-            sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning'),
-            sac.StepsItem(title='الخطوة 2' if lang=='AR' else 'Step 2', subtitle='فحص التربة والأسس' if lang=='AR' else 'Soil Audit'),
-            sac.StepsItem(title='الخطوة 3' if lang=='AR' else 'Step 3', subtitle='التدقيق الإنشائي' if lang=='AR' else 'Structural', disabled=True),
-            sac.StepsItem(title='الخطوة 4' if lang=='AR' else 'Step 4', subtitle='الشبكة الصحية' if lang=='AR' else 'Sanitary', disabled=True),
-            sac.StepsItem(title='الخطوة 5' if lang=='AR' else 'Step 5', subtitle='المنظومة الكهربائية' if lang=='AR' else 'Electrical', disabled=True)
+            'الخطوة 1: المحددات البلدية' if lang=='AR' else 'Step 1: Zoning',
+            'الخطوة 2: فحص التربة والأسس' if lang=='AR' else 'Step 2: Soil Audit',
+            '🔒 الخطوة 3: التدقيق الإنشائي' if lang=='AR' else '🔒 Step 3: Structural',
+            '🔒 الخطوة 4: الشبكة الصحية' if lang=='AR' else '🔒 Step 4: Sanitary',
+            '🔒 الخطوة 5: المنظومة الكهربائية' if lang=='AR' else '🔒 Step 5: Electrical'
         ],
-        index=1,
+        index=1, # الإبقاء على تشغيل وتنشيط خطوة فحص التربة الحالية تلقائياً حياً
         format='dot',
-        direction='horizontal',
-        return_index=False
+        direction='horizontal'
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
