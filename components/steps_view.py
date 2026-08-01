@@ -8,15 +8,16 @@ def render_steps_and_calculators(L, lang):
     align = "right" if lang == "AR" else "left"
     
     # 1. شريط الخطوات المتطورة والأقفال الذكية الجاهز والمطابق للتصميم تماماً
-    st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
+       st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
     sac.steps(
         items=[
-            sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning', status='finish'),
-            sac.StepsItem(title='الخطوة 2' if lang=='AR' else 'Step 2', subtitle='فحص التربة والأسس' if lang=='AR' else 'Soil Audit', status='process'),
+            sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning'),
+            sac.StepsItem(title='الخطوة 2' if lang=='AR' else 'Step 2', subtitle='فحص التربة والأسس' if lang=='AR' else 'Soil Audit'),
             sac.StepsItem(title='الخطوة 3' if lang=='AR' else 'Step 3', subtitle='التدقيق الإنشائي' if lang=='AR' else 'Structural', disabled=True),
             sac.StepsItem(title='الخطوة 4' if lang=='AR' else 'Step 4', subtitle='الشبكة الصحية' if lang=='AR' else 'Sanitary', disabled=True),
             sac.StepsItem(title='الخطوة 5' if lang=='AR' else 'Step 5', subtitle='المنظومة الكهربائية' if lang=='AR' else 'Electrical', disabled=True)
         ],
+        index=1,
         format='dot',
         direction='horizontal',
         return_index=False
