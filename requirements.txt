@@ -2,3 +2,5 @@ streamlit
 plotly
 pandas
 reportlab
+streamlit-shadcn-ui
+streamlit-antd-components
