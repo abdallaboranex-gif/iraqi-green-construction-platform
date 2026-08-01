@@ -8,7 +8,7 @@ def render_steps_and_calculators(L, lang):
     align = "right" if lang == "AR" else "left"
     
     # 1. شريط الخطوات المتطورة والأقفال الذكية الجاهز والمطابق للتصميم تماماً
-       st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
+        st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
     sac.steps(
         items=[
             sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning'),
@@ -23,6 +23,7 @@ def render_steps_and_calculators(L, lang):
         return_index=False
     )
     st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
     
     # 2. حقول الإدخال والمقاييس لـ (الخطوة 1) كما هي مخزنة داخل حاويتك الأصلية
