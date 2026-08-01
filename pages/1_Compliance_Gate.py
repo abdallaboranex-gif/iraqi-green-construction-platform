@@ -81,3 +81,22 @@ with col_center_stage:
 # ==================== 3️⃣ الجانب الأيمن: لوحة التحليلات والمؤشرات المركزية والطقس الحي ====================
 with col_right_stats:
     render_sidebar_analytics(L, lang)
+# --- 🔍 كود جرد وتفتيش شجرة ملفات المشروع حياً (امسحه بعد المراجعة) ---
+st.markdown("---")
+st.markdown("### 🔍 شجرة ملفات ومسارات المشروع الحالية حياً:")
+
+import os
+def get_project_tree(startpath="."):
+    tree_str = ""
+    for root, dirs, files in os.walk(startpath):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['venv', '__pycache__', '.git']]
+        level = root.replace(startpath, '').count(os.sep)
+        indent = '&nbsp;' * 6 * level
+        tree_str += f"{indent}📁 <b>{os.path.basename(root)}/</b><br>"
+        for f in files:
+            if not f.startswith('.'):
+                file_indent = '&nbsp;' * 6 * (level + 1)
+                tree_str += f"{file_indent}📄 {f}<br>"
+    return tree_str
+
+st.markdown(f"<div style='background-color: #0F172A; color: #10B981; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.9rem;'>{get_project_tree()}</div>", unsafe_allow_html=True)
