@@ -43,8 +43,9 @@ from components.sidebar_metrics import render_sidebar_analytics
 from components.gate2_sustainability import render_sustainability_gate
 from components.gate3.gate3_main import render_analytics_gate
 from components.gate4.gate4_main import render_sovereign_map_gate
-# استدعاء واجهة البوابة الخامسة المالية وجباية الرسوم الإلكترونية الجديدة بالملي
 from components.gate5.gate5_main import render_billing_gate
+# استدعاء واجهة البوابة السادسة للتفتيش الرقمي والسلامة الموقعية الجديدة بالملي
+from components.gate6.gate6_main import render_safety_inspection_gate
 
 L = render_header()
 lang = st.session_state["lang"]
@@ -72,10 +73,10 @@ with col_center_stage:
     elif current_gate == "gate_4":
         render_sovereign_map_gate(L, lang, direction, align)
     elif current_gate == "gate_5":
-        # 🚀 تشغيل واستدعاء البوابة الخامسة: جباية الرسوم الإلكترونية وفواتير واشتراكات المكاتب حياً
         render_billing_gate(L, lang, direction, align)
     elif current_gate == "gate_6":
-        st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: {align};'><h3>{L['gate_6_title']}</h3><p style='color:#6B7280;'>📷 منظومة التفتيش الرقمي الميداني واستقبال صور الكشف البلدي الموقعي...</p></div>", unsafe_allow_html=True)
+        # 🚀 تشغيل واستدعاء البوابة السادسة والأخيرة: التفتيش الرقمي والسلامة الموقعية حياً
+        render_safety_inspection_gate(L, lang, direction, align)
 
 # ==================== 3️⃣ الجانب الأيمن: لوحة التحليلات والمؤشرات المركزية والطقس الحي ====================
 with col_right_stats:
