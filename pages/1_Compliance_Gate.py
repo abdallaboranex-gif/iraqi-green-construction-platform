@@ -1,7 +1,7 @@
 # pages/1_Compliance_Gate.py
 import streamlit as st
 
-# 1. تجميد السايدبار الافتراضي ومنع تمدد الشاشة المفرط لتسريع حركة التصفح
+# 1. تجميد السايدبار الافتراضي للتحكم بهوية وأبعاد المنصة السيادية حياً
 st.set_page_config(
     page_title="Iraqi Green Construction Data Platform", 
     layout="wide",
@@ -30,21 +30,22 @@ st.markdown("""
         .stSelectbox, .stNumberInput, .stTextInput { background-color: white !important; border-radius: 10px !important; }
     </style>
 """, unsafe_allow_html=True)
+
 # 3. تأمين قيم الذاكرة الافتتاحية للمنصة في الجلسة الحية لمنع الـ KeyError
 if "lang" not in st.session_state: st.session_state["lang"] = "AR"
 if "active_gate" not in st.session_state: st.session_state["active_gate"] = "gate_1"
 if "compliance_rate" not in st.session_state: st.session_state["compliance_rate"] = 42
 if "step2_status" not in st.session_state: st.session_state["step2_status"] = "In Progress"
 
-# 4. استدعاء الترويسة ومكونات المنصة الهندسية الكبرى من مساراتها النظيفة المعزولة
+# 4. استدعاء الترويسة ومكونات المنصة الهندسية الكبرى من مساراتها المفرزة النظيفة
 from components.header import render_header
 from components.steps_view import render_steps_and_calculators
 from components.sidebar_metrics import render_sidebar_analytics
-from components.gate2_sustainability import render_sustainability_gate
+# تحديث مسار استدعاء البوابة الثانية لتشير إلى المجلد المفرز الجديد
+from components.gate2.gate2_sustainability import render_sustainability_gate
 from components.gate3.gate3_main import render_analytics_gate
 from components.gate4.gate4_main import render_sovereign_map_gate
 from components.gate5.gate5_main import render_billing_gate
-# استدعاء واجهة البوابة السادسة للتفتيش الرقمي والسلامة الموقعية الجديدة بالملي
 from components.gate6.gate6_main import render_safety_inspection_gate
 
 L = render_header()
@@ -61,6 +62,7 @@ with col_left_nav:
         if st.button(g_title, use_container_width=True, type="primary" if st.session_state["active_gate"] == g_id else "secondary", key=f"btn_nav_{g_id}"):
             st.session_state["active_gate"] = g_id
             st.rerun()
+
 # ==================== 2️⃣ القطاع الأوسط الحركي: عرض شاشة البوابة المحددة حياً ====================
 with col_center_stage:
     current_gate = st.session_state["active_gate"]
@@ -75,15 +77,16 @@ with col_center_stage:
     elif current_gate == "gate_5":
         render_billing_gate(L, lang, direction, align)
     elif current_gate == "gate_6":
-        # 🚀 تشغيل واستدعاء البوابة السادسة والأخيرة: التفتيش الرقمي والسلامة الموقعية حياً
+        # تفعيل واستدعاء البوابة السادسة والأخيرة: التفتيش الرقمي والسلامة الموقعية حياً
         render_safety_inspection_gate(L, lang, direction, align)
 
 # ==================== 3️⃣ الجانب الأيمن: لوحة التحليلات والمؤشرات المركزية والطقس الحي ====================
 with col_right_stats:
     render_sidebar_analytics(L, lang)
-# --- 🔍 كود جرد وتفتيش شجرة ملفات المشروع حياً (امسحه بعد المراجعة) ---
+
+# --- كود جرد وتفتيش شجرة ملفات المشروع حياً (اسحبه بعد المراجعة) ---
 st.markdown("---")
-st.markdown("### 🔍 شجرة ملفات ومسارات المشروع الحالية حياً:")
+st.markdown("### 🔍 **شجرة ملفات ومسارات المشروع الحالية حياً:**")
 
 import os
 def get_project_tree(startpath="."):
@@ -92,11 +95,11 @@ def get_project_tree(startpath="."):
         dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['venv', '__pycache__', '.git']]
         level = root.replace(startpath, '').count(os.sep)
         indent = '&nbsp;' * 6 * level
-        tree_str += f"{indent}📁 <b>{os.path.basename(root)}/</b><br>"
+        tree_str += f"{indent} 📁 <b>{os.path.basename(root)}/</b><br>"
         for f in files:
             if not f.startswith('.'):
                 file_indent = '&nbsp;' * 6 * (level + 1)
-                tree_str += f"{file_indent}📄 {f}<br>"
+                tree_str += f"{file_indent} 📄 {f}<br>"
     return tree_str
 
 st.markdown(f"<div style='background-color: #0F172A; color: #10B981; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.9rem;'>{get_project_tree()}</div>", unsafe_allow_html=True)
