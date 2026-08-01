@@ -1,36 +1,33 @@
 # components/steps_view.py
 import streamlit as st
+import streamlit_antd_components as sac
 
 def render_steps_and_calculators(L, lang):
-    """رسم وإعادة بناء بوابات التدقيق والمطابقة الكودية بمؤشرات حية وشارات ملونة"""
+    """رسم بوابات التدقيق المتسلسلة والمقفلة بمكونات احترافية جاهزة ومصقولة عالمياً"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
     
-    # 1️⃣ شريط المرحلة الطولي والترويسية العلوية للمرحلة الأولى
-    st.markdown(f"""
-    <div dir="{direction}" style="margin-bottom: 24px; text-align: {align};">
-        <span style="background-color: #EFF6FF; color: #1E40AF; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; border: 1px solid #BFDBFE;">
-            {L['phase']} 1
-        </span>
-        <span style="font-weight: 700; font-size: 1.2rem; color: #0F172A; margin: 0 12px;">{L['eng_comp']}</span>
-        <span style="font-size: 0.85rem; color: #64748B;">({L['seq_order']})</span>
-    </div>
-    """, unsafe_allow_html=True)
+    # 1. شريط الخطوات المتطورة والأقفال الذكية الجاهز والمطابق للتصميم تماماً
+    st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
+    sac.steps(
+        items=[
+            sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning', status='finish'),
+            sac.StepsItem(title='الخطوة 2' if lang=='AR' else 'Step 2', subtitle='فحص التربة والأسس' if lang=='AR' else 'Soil Audit', status='process'),
+            sac.StepsItem(title='الخطوة 3' if lang=='AR' else 'Step 3', subtitle='التدقيق الإنشائي' if lang=='AR' else 'Structural', disabled=True),
+            sac.StepsItem(title='الخطوة 4' if lang=='AR' else 'Step 4', subtitle='الشبكة الصحية' if lang=='AR' else 'Sanitary', disabled=True),
+            sac.StepsItem(title='الخطوة 5' if lang=='AR' else 'Step 5', subtitle='المنظومة الكهربائية' if lang=='AR' else 'Electrical', disabled=True)
+        ],
+        format='dot',
+        direction='horizontal',
+        return_index=False
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
     
-    # ==================== 🟢 الخطوة 1: بوابة المحددات البلدية والمناطق ====================
+    # 2. حقول الإدخال والمقاييس لـ (الخطوة 1) كما هي مخزنة داخل حاويتك الأصلية
     with st.container(border=True):
-        # حقن شارة الاكتمال الخضراء المستديرة عائمة لتطابق التصميم تماماً
-        st.markdown(f"""
-        <div dir="{direction}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; text-align: {align};">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="background-color: #10B981; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; font-family: sans-serif;">1</span>
-                <b style="color: #1E293B; font-size: 1rem;">{L['step1_title']}</b>
-            </div>
-            <span style="background-color: #DEF7EC; color: #03543F; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid #84E1BC;">
-                ✓ {"مكتمل" if lang == "AR" else "Completed"}
-            </span>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align: {align}; font-weight: bold; color: #1E293B; margin-bottom: 12px;'>📋 معطيات الموقع والمحددات الحالية:</div>", unsafe_allow_html=True)
+
            # حقول الإدخال الهندسية مقسمة بالتناظر على 3 أعمدة
         col1, col2, col3 = st.columns(3)
         with col1:
