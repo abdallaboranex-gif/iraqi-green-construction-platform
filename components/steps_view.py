@@ -31,31 +31,32 @@ def render_steps_and_calculators(L, lang):
             </span>
         </div>
         """, unsafe_allow_html=True)
-        # حقول الإدخال الهندسية مقسمة بالتناظر على 3 أعمدة
+           # حقول الإدخال الهندسية مقسمة بالتناظر على 3 أعمدة
         col1, col2, col3 = st.columns(3)
         with col1:
             gov_opts = {"": "اختر المحافظة...", "بغداد": "Baghdad", "صلاح الدين": "Salah_Al_Din", "الأنبار": "Anbar", "النجف الأشرف": "Najaf", "نينوى": "Nineveh", "البصرة": "Basra"} if lang == "AR" else {"": "Select Governorate...", "Baghdad": "Baghdad", "Salah_Al_Din": "Salah_Al_Din", "Anbar": "Anbar", "Najaf": "Najaf", "Nineveh": "Nineveh", "Basra": "Basra"}
-            f_gov = gov_opts[st.selectbox(L['gov_lbl'], list(gov_opts.keys()), key="w_gov")]
+            f_gov = gov_opts[st.selectbox("المحافظة" if lang == "AR" else "Governorate", list(gov_opts.keys()), key="w_gov")]
             
             req_opts = ["", "بناء جديد", "إعادة تأهيل", "ترميم", "إضافة طابق", "مشاريع كبرى"] if lang == "AR" else ["", "New Construction", "Reconstruction", "Floor Addition", "Renovation", "Major Projects"]
-            f_req = st.selectbox(L['req_lbl'], req_opts, key="w_req")
-            f_plot = st.text_input(L['plot_lbl'], key="w_lot", placeholder="1024/5")
+            f_req = st.selectbox("نوع الطلب / المعاملة" if lang == "AR" else "Request Type", req_opts, key="w_req")
+            f_plot = st.text_input("رقم قطعة العقار (المرقم)" if lang == "AR" else "Plot Number", key="w_lot", placeholder="1024/5")
             
         with col2:
             usage_opts = ["", "سكني", "تجاري", "خدمي", "صناعي", "مجمعات"] if lang == "AR" else ["", "Residential", "Commercial", "Service", "Industrial", "Complexes"]
-            f_usage = st.selectbox(L['usage_lbl'], usage_opts, key="w_usage")
-            f_width = st.number_input(L['front_lbl'], min_value=0.0, step=0.5, key="w_width")
-            f_sec = st.text_input(L['sec_lbl'], key="w_sec", placeholder="42")
+            f_usage = st.selectbox("الاستعمال المخطط الأساسي" if lang == "AR" else "Primary Usage", usage_opts, key="w_usage")
+            f_width = st.number_input("عرض الواجهة (متر)" if lang == "AR" else "Frontage Width (m)", min_value=0.0, step=0.5, key="w_width")
+            f_sec = st.text_input("رقم المقاطعة والبلدية" if lang == "AR" else "District Number", key="w_sec", placeholder="42")
             
         with col3:
-            f_street = st.number_input(L['street_lbl'], min_value=0.0, step=0.5, key="w_street")
-            f_length = st.number_input(L['length_lbl'], min_value=0.0, step=0.5, key="w_length")
+            f_street = st.number_input("عرض الشارع المقابل (متر)" if lang == "AR" else "Street Width (m)", min_value=0.0, step=0.5, key="w_street")
+            f_length = f_length = st.number_input("طول الأرض / النزال (متر)" if lang == "AR" else "Land Length (m)", min_value=0.0, step=0.5, key="w_length")
             base_opts = ["", "موجود", "غير موجود"] if lang == "AR" else ["", "Present", "Not Present"]
-            f_base = st.selectbox(L['base_lbl'], base_opts, key="w_base")
+            f_base = st.selectbox("هل يوجد طابق سرداب؟" if lang == "AR" else "Basement?", base_opts, key="w_base")
 
-        f_floors = st.number_input(L['floors_lbl'], min_value=0, max_value=60, key="w_floors")
+        f_floors = st.number_input("عدد الطوابق فوق الأرض" if lang == "AR" else "Floors Above Ground", min_value=0, max_value=60, key="w_floors")
         dir_opts = ["", "شمالي", "جنوبي", "شرقي", "غربي", "شمالي شرقي", "شمالي غربي", "جنوبي شرقي", "جنوبي غربي"] if lang == "AR" else ["", "North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"]
-        st.selectbox(L['orient_lbl'], dir_opts, key="w_orient")
+        st.selectbox("اتجاه واجهة المبنى الجغرافية" if lang == "AR" else "Frontage Orientation", dir_opts, key="w_orient")
+
         
         # حسابات المساحة الكلية وتصنيف الأحمال الإنشائية
         calculated_area = f_width * f_length
