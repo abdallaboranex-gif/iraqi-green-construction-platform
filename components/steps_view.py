@@ -1,26 +1,55 @@
 # components/steps_view.py
 import streamlit as st
-import streamlit_antd_components as sac
 
 def render_steps_and_calculators(L, lang):
-    """رسم بوابات التدقيق المتسلسلة والمقفلة بمكونات احترافية جاهزة ومصقولة عالمياً"""
+    """رسم وإعادة بناء بوابات التدقيق المتسلسلة والمقفلة بأكواد ويب صافية ومضمونة 100%"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
-    # 1. شريط الخطوات المتطورة الجاهز والمبني بأعلى دقة توافقية سحابية
-    st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
-    sac.steps(
-        items=[
-            'الخطوة 1: المحددات البلدية' if lang=='AR' else 'Step 1: Zoning',
-            'الخطوة 2: فحص التربة والأسس' if lang=='AR' else 'Step 2: Soil Audit',
-            '🔒 الخطوة 3: التدقيق الإنشائي' if lang=='AR' else '🔒 Step 3: Structural',
-            '🔒 الخطوة 4: الشبكة الصحية' if lang=='AR' else '🔒 Step 4: Sanitary',
-            '🔒 الخطوة 5: المنظومة الكهربائية' if lang=='AR' else '🔒 Step 5: Electrical'
-        ],
-        index=1, # الإبقاء على تشغيل وتنشيط خطوة فحص التربة الحالية تلقائياً حياً
-        format='dot',
-        direction='horizontal'
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+
+    # 1. تصميم شريط الخطوات المتتالية والأقفال الاحترافي المطابق للصورة بالملي عبر HTML/CSS
+    steps_html = f"""
+    <div dir="{direction}" style="display: flex; gap: 10px; justify-content: space-between; margin-bottom: 25px; text-align: {align}; flex-wrap: wrap;">
+        <!-- الخطوة 1 المكتملة -->
+        <div style="background-color: white; border: 1px solid #E2E8F0; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <span style="background-color: #10B981; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: sans-serif;">✓</span>
+            <div style="font-size: 11px; font-weight: bold; color: #1E293B;">{'الخطوة 1: المحددات' if lang=='AR' else 'Step 1: Zoning'}</div>
+        </div>
+        
+        <!-- الخطوة 2 الجارية -->
+        <div style="background-color: #FFF7ED; border: 1px solid #FFEDD5; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <span style="background-color: #F97316; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: sans-serif;">2</span>
+            <div style="font-size: 11px; font-weight: bold; color: #9A3412;">{'الخطوة 2: فحص التربة' if lang=='AR' else 'Step 2: Soil Audit'}</div>
+        </div>
+
+        <!-- الخطوة 3 المقفلة -->
+        <div style="background-color: #F8FAFC; border: 1px dashed #CBD5E1; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex: 1; min-width: 140px; opacity: 0.75;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="background-color: #94A3B8; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: sans-serif;">3</span>
+                <div style="font-size: 11px; font-weight: bold; color: #64748B;">{'الخطوة 3: الإنشائي' if lang=='AR' else 'Step 3: Structural'}</div>
+            </div>
+            <span style="font-size: 12px;">🔒</span>
+        </div>
+
+        <!-- الخطوة 4 المقفلة -->
+        <div style="background-color: #F8FAFC; border: 1px dashed #CBD5E1; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex: 1; min-width: 140px; opacity: 0.75;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="background-color: #94A3B8; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: sans-serif;">4</span>
+                <div style="font-size: 11px; font-weight: bold; color: #64748B;">{'الخطوة 4: الصحي' if lang=='AR' else 'Step 4: Sanitary'}</div>
+            </div>
+            <span style="font-size: 12px;">🔒</span>
+        </div>
+
+        <!-- الخطوة 5 المقفلة -->
+        <div style="background-color: #F8FAFC; border: 1px dashed #CBD5E1; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex: 1; min-width: 140px; opacity: 0.75;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="background-color: #94A3B8; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: sans-serif;">5</span>
+                <div style="font-size: 11px; font-weight: bold; color: #64748B;">{'الخطوة 5: الكهربائي' if lang=='AR' else 'Step 5: Electrical'}</div>
+            </div>
+            <span style="font-size: 12px;">🔒</span>
+        </div>
+    </div>
+    """
+    st.markdown(steps_html, unsafe_allow_html=True)
 
     st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
     
