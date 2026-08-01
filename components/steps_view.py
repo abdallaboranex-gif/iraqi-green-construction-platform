@@ -6,9 +6,9 @@ def render_steps_and_calculators(L, lang):
     """رسم بوابات التدقيق المتسلسلة والمقفلة بمكونات احترافية جاهزة ومصقولة عالمياً"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
-    
+
     # 1. شريط الخطوات المتطورة والأقفال الذكية الجاهز والمطابق للتصميم تماماً
-        st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
+    st.markdown(f'<div dir="{direction}">', unsafe_allow_html=True)
     sac.steps(
         items=[
             sac.StepsItem(title='الخطوة 1' if lang=='AR' else 'Step 1', subtitle='المحددات البلدية' if lang=='AR' else 'Zoning'),
