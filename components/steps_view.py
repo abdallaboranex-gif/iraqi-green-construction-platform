@@ -2,34 +2,26 @@
 import streamlit as st
 
 def render_steps_and_calculators(L, lang):
-    """إعادة البناء والإنقاذ الكامل لمنظومة الخطوات التتابعية بأمان بايثون الصافي 100%"""
+    """منظومة الخطوات التتابعية بأمان بايثون الصافي 100%"""
     direction = "rtl" if lang == "AR" else "ltr"
     align = "right" if lang == "AR" else "left"
 
-    # 1. بناء شريط المراحل التتابعية والأقفال باستخدام نظام الأعمدة الصافي لـ Streamlit لحماية الواجهة
-    st.markdown(f"<div style='text-align: {align}; font-weight: bold; color: #1E3A8A; margin-bottom: 12px;'>🛠️ بوابات التحكم والمنظومة الحالية:</div>", unsafe_allow_html=True)
-    
-    # تقسيم الشاشة لخمسة أعمدة صغيرة متوازية لتمثيل الـ 5 خطوات بدقة
+    # تقسيم الشاشة لخمسة أعمدة صغيرة متوازية لتمثيل الـ 5 خطوات
     s_col1, s_col2, s_col3, s_col4, s_col5 = st.columns(5)
-    
     with s_col1:
         st.info("✓ الخطوة 1" if lang=="AR" else "✓ Step 1")
-        
     with s_col2:
         st.success("⏳ الخطوة 2" if lang=="AR" else "⏳ Step 2")
-        
     with s_col3:
         st.text("🔒 الخطوة 3" if lang=="AR" else "🔒 Step 3")
-        
     with s_col4:
         st.text("🔒 الخطوة 4" if lang=="AR" else "🔒 Step 4")
-        
     with s_col5:
         st.text("🔒 الخطوة 5" if lang=="AR" else "🔒 Step 5")
 
     st.markdown("---")
     
-    # 2. حقول الإدخال والمقاييس لـ (الخطوة 1) كما هي مخزنة داخل حاويتك الأصلية المستقرة
+    # حقول الإدخال والمقاييس لـ (الخطوة 1) تبدأ مباشرة هنا بالسطر التالي
     with st.container(border=True):
         st.markdown(f"<div style='text-align: {align}; font-weight: bold; color: #1E293B; margin-bottom: 12px;'>📋 معطيات الموقع والمحددات الحالية:</div>", unsafe_allow_html=True)
 
