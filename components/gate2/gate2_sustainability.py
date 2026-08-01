@@ -1,11 +1,11 @@
 # components/gate2_sustainability.py
 import streamlit as st
 
-# استدعاء العمليات الأربعة الذكية المعزولة
-from components.gate2_insulation import render_insulation_section
-from components.gate2_solar_optimizer import render_solar_optimizer_section
-from components.gate2_hvac import render_hvac_section
-from components.gate2_recommendations import render_energy_recommendations
+# استدعاء العمليات الأربعة الذكية بعد نقلها داخل المجلد الفرعي الجديد gate2
+from components.gate2.gate2_insulation import render_insulation_section
+from components.gate2.gate2_solar_optimizer import render_solar_optimizer_section
+from components.gate2.gate2_hvac import render_hvac_section
+from components.gate2.gate2_recommendations import render_energy_recommendations
 
 def render_sustainability_gate(L, lang, direction, align):
     """الموزع الرقمي السيادي المستقل لبوابة إدارة الطاقة والاستدامة"""
